@@ -1,4 +1,4 @@
-let defaultTex = function() {
+const defaultTex = () => {
 	let texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -10,7 +10,7 @@ let defaultTex = function() {
 }
 
 let textures = {};
-let loadTex = function(src, index) {
+const loadTex = (src, index) => {
 	let texture = defaultTex();
 	//Asynchronously load an image
 	let image = new Image();

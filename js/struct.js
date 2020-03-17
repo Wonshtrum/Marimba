@@ -45,6 +45,35 @@ class VertexArray {
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ib)
 	}
 	draw() {
+		this.bind();
 		gl.drawElements(gl.TRIANGLES, 6*this.quadCount, gl.UNSIGNED_SHORT, 0);
+	}
+}
+
+class FrameBuffer {
+	constructor(width, height, n) {
+		this.width = width;
+		this.height = height;
+		this.tex = Array(n);
+		this.fbo = gl.createFramebuffer();
+		this.attachments = Array.from({length:n}, (_,i)=>gl.COLOR_ATTACHMENT0+i);
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
+		for (let i = 0 ; i < n ; i++) {
+			gl.activeTexture(gl.TEXTURE0+i);
+			this.tex[i] = defaultTex();
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.attachments[i], gl.TEXTURE_2D, this.tex[i], 0);
+		}
+		this.bind();
+	}
+	bind() {
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
+		gl.drawBuffers(this.attachments);
+		gl.viewport(0, 0, this.width, this.height);
+	}
+	unbind() {
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		gl.drawBuffers([gl.BACK]);
+		gl.viewport(0, 0, canvas.width, canvas.height);
 	}
 }
