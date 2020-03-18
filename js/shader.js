@@ -90,7 +90,7 @@ const shader3 = new Shader(
 	out vec4 fragColor;
 
 	void main() {
-		fragColor = texture(u_tex[1], v_position);
+		fragColor = texture(u_tex[0], v_position)+texture(u_tex[1], v_position);
 	}
 	`
 );

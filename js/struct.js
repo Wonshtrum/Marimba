@@ -52,6 +52,7 @@ class VertexArray {
 
 class FrameBuffer {
 	constructor(width, height, n) {
+		this.n = n;
 		this.width = width;
 		this.height = height;
 		this.tex = Array(n);
@@ -70,6 +71,10 @@ class FrameBuffer {
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
 		gl.drawBuffers(this.attachments);
 		gl.viewport(0, 0, this.width, this.height);
+		for (let i = 0 ; i < this.n ; i++) {
+			gl.activeTexture(gl.TEXTURE0+i);
+			gl.bindTexture(gl.TEXTURE_2D, this.tex[i]);
+		}
 	}
 	unbind() {
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
