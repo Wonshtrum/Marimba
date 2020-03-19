@@ -8,7 +8,7 @@ let col = 10;
 let width = col*side;
 let height = row*side;
 
-let canvasScale = 2;
+let canvasScale = 1;
 
 canvas.width = width*canvasScale;
 canvas.height = height*canvasScale;

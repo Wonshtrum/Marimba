@@ -146,5 +146,4 @@ shader3.bind();
 gl.uniform1iv(shader3.uniforms.u_tex, [1,2]);
 
 shader4.bind();
-gl.uniform2f(shader4.uniforms.u_screen, width, height);
-gl.uniform2f(shader4.uniforms.u_screen, width, height);
+gl.uniform2f(shader4.uniforms.u_screen, width/2, height/2);
