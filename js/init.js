@@ -1,10 +1,17 @@
 //INITIALISATION
 const canvas = document.getElementById('myCan');
-let width = 500;
-let height = 500;
+let side = 55;
 
-canvas.width = width;
-canvas.height = height;
+let row = 5;
+let col = 10;
+
+let width = col*side;
+let height = row*side;
+
+let canvasScale = 2;
+
+canvas.width = width*canvasScale;
+canvas.height = height*canvasScale;
 const gl = canvas.getContext('webgl2', { preserveDrawingBuffer: true, premultipliedAlpha: false });
 gl.enable(gl.BLEND);
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
