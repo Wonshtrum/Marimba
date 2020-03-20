@@ -25,3 +25,5 @@ const loadTex = (src, index) => {
 };
 
 loadTex("img.png","kirby");
+loadTex("sprites.png","sprites");
+loadTex("spritesC.png","spritesC");

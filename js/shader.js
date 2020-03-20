@@ -107,8 +107,18 @@ const shaderBright = new Shader(
 	layout(location = 1) out vec4 brightColor;
 
 	void main() {
-		baseColor = texture(u_tex, v_texCoord);
-		brightColor = vec4(v_color, 1);
+		vec2 sprite = vec2(1, int(v_fill));
+		if (1.0-v_texCoord.y < fract(v_fill)) {
+			sprite.x = 2.0;
+		}
+		baseColor = texture(u_tex, (sprite+v_texCoord)*vec2(0.25,0.2));
+		brightColor = vec4(0);
+		if (baseColor == vec4(0,1,0,1)) {
+			baseColor = vec4(v_color, 1);
+			brightColor = baseColor;
+		} else if (0.3*baseColor.r+0.59*baseColor.g+0.11*baseColor.b > 0.6) {
+			brightColor = baseColor;
+		}
 	}`
 )
 
@@ -125,7 +135,8 @@ const shaderBlurH = new Shader(
 	out vec4 fragColor;
 
 	void main() {
-		float w[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
+		//float w[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
+		float w[5] = float[] (0.22, 0.15, 0.1, 0.09, 0.08);
 		vec2 pixel = vec2(1)/vec2(textureSize(u_tex, 0));
 		pixel.y = 0.0;
 		vec3 color = texture(u_tex, v_texCoord).rgb*w[0];
@@ -149,7 +160,8 @@ const shaderBlurV = new Shader(
 	out vec4 fragColor;
 
 	void main() {
-		float w[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
+		//float w[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
+		float w[5] = float[] (0.22, 0.15, 0.1, 0.09, 0.08);
 		vec2 pixel = vec2(1)/vec2(textureSize(u_tex, 0));
 		pixel.x = 0.0;
 		vec3 color = texture(u_tex, v_texCoord).rgb*w[0];
@@ -163,14 +175,15 @@ const shaderBlurV = new Shader(
 
 shaderTex.bind();
 gl.uniform2f(shaderTex.uniforms.u_screen, 1, 1);
-gl.uniform1iv(shaderTex.uniforms.u_tex, [0,1,2]);
+gl.uniform1iv(shaderTex.uniforms.u_tex, [0,2,3]);
 
 shaderBright.bind();
+gl.uniform1i(shaderBright.uniforms.u_tex, 0);
 gl.uniform2f(shaderBright.uniforms.u_screen, width/2, height/2);
 
 shaderBlurH.bind();
 gl.uniform2f(shaderBlurH.uniforms.u_screen, 1, 1);
-gl.uniform1i(shaderBlurH.uniforms.u_tex, 2);
+gl.uniform1i(shaderBlurH.uniforms.u_tex, 3);
 shaderBlurV.bind();
 gl.uniform2f(shaderBlurV.uniforms.u_screen, 1, 1);
-gl.uniform1i(shaderBlurV.uniforms.u_tex, 3);
+gl.uniform1i(shaderBlurV.uniforms.u_tex, 4);

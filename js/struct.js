@@ -62,7 +62,7 @@ class BatchVA {
 		this.preBind = preBind;
 
 		//CPU BUFFERS
-		//[x, y, fill, r, g, b]
+		//[x, y, tex.fill, r, g, b]
 		let layout = [2, 1, 3]
 		let totalSize = layout.reduce((a,b)=>a+b,0);
 		this.vertexBuffer = new Float32Array(totalSize*4*maxQuad);
@@ -121,14 +121,14 @@ class BatchVA {
 		this.quad = 0;
 		this.dataIndex = 0;
 	}
-	drawQuad(x, y, w, h, f, r, g, b) {
+	drawQuad(x, y, w, h, t, f, r, g, b) {
 		if (this.quad >= this.maxQuad) {
 			this.flush();
 			this.begin();
 		}
 		this.vertexBuffer[this.dataIndex + 0] = x;
 		this.vertexBuffer[this.dataIndex + 1] = y;
-		this.vertexBuffer[this.dataIndex + 2] = f;
+		this.vertexBuffer[this.dataIndex + 2] = t+f;
 		this.vertexBuffer[this.dataIndex + 3] = r;
 		this.vertexBuffer[this.dataIndex + 4] = g;
 		this.vertexBuffer[this.dataIndex + 5] = b;
@@ -136,7 +136,7 @@ class BatchVA {
 
 		this.vertexBuffer[this.dataIndex + 0] = x+w;
 		this.vertexBuffer[this.dataIndex + 1] = y;
-		this.vertexBuffer[this.dataIndex + 2] = f;
+		this.vertexBuffer[this.dataIndex + 2] = t+f;
 		this.vertexBuffer[this.dataIndex + 3] = r;
 		this.vertexBuffer[this.dataIndex + 4] = g;
 		this.vertexBuffer[this.dataIndex + 5] = b;
@@ -144,7 +144,7 @@ class BatchVA {
 
 		this.vertexBuffer[this.dataIndex + 0] = x+w;
 		this.vertexBuffer[this.dataIndex + 1] = y+h;
-		this.vertexBuffer[this.dataIndex + 2] = f;
+		this.vertexBuffer[this.dataIndex + 2] = t+f;
 		this.vertexBuffer[this.dataIndex + 3] = r;
 		this.vertexBuffer[this.dataIndex + 4] = g;
 		this.vertexBuffer[this.dataIndex + 5] = b;
@@ -152,7 +152,7 @@ class BatchVA {
 
 		this.vertexBuffer[this.dataIndex + 0] = x;
 		this.vertexBuffer[this.dataIndex + 1] = y+h;
-		this.vertexBuffer[this.dataIndex + 2] = f;
+		this.vertexBuffer[this.dataIndex + 2] = t+f;
 		this.vertexBuffer[this.dataIndex + 3] = r;
 		this.vertexBuffer[this.dataIndex + 4] = g;
 		this.vertexBuffer[this.dataIndex + 5] = b;
