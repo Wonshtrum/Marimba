@@ -65,7 +65,7 @@ const shaderTex = new Shader(
 
 	void main() {
 		vec3 color = vec3(0);
-		for (int i = 1 ; i < 3 ; i++) {
+		for (int i = 0 ; i < 3 ; i++) {
 			color += texture(u_tex[i], v_texCoord).rgb;
 		}
 		fragColor = vec4(color, 1);
@@ -114,9 +114,9 @@ const shaderBright = new Shader(
 		baseColor = texture(u_tex, (sprite+v_texCoord)*vec2(0.25,0.2));
 		brightColor = vec4(0);
 		if (baseColor == vec4(0,1,0,1)) {
-			baseColor = vec4(v_color, 1);
-			brightColor = baseColor;
-		} else if (0.3*baseColor.r+0.59*baseColor.g+0.11*baseColor.b > 0.6) {
+			baseColor = vec4(v_color, 0.5);
+			brightColor = vec4(v_color, 1);
+		} else if (fract(v_fill) > 0.0 && 0.3*baseColor.r+0.59*baseColor.g+0.11*baseColor.b > 0.6) {
 			brightColor = baseColor;
 		}
 	}`
@@ -175,7 +175,7 @@ const shaderBlurV = new Shader(
 
 shaderTex.bind();
 gl.uniform2f(shaderTex.uniforms.u_screen, 1, 1);
-gl.uniform1iv(shaderTex.uniforms.u_tex, [0,2,3]);
+gl.uniform1iv(shaderTex.uniforms.u_tex, [1,2,3]);
 
 shaderBright.bind();
 gl.uniform1i(shaderBright.uniforms.u_tex, 0);

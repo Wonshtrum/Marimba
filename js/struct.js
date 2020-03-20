@@ -122,6 +122,7 @@ class BatchVA {
 		this.dataIndex = 0;
 	}
 	drawQuad(x, y, w, h, t, f, r, g, b) {
+		y -= 8;
 		if (this.quad >= this.maxQuad) {
 			this.flush();
 			this.begin();

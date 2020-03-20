@@ -15,11 +15,8 @@ let xyOnMap = function(e) {
 	return [clamp(x, 0, map.w-1), clamp(y, 0, map.h-1)];
 };
 
-
+let mouse = [0, 0];
 canvas.onmousemove = function(e) {
 	let [x, y] = xyOnMapPixel(e);
-	let n = 0;
-	lights[n][0] = x-width/2;
-	lights[n][1] = height/2-y;
-	gl.uniform3fv(uLights, lights.flat());
+	mouse = [x-5*side, y-2.5*side];
 }
