@@ -52,53 +52,28 @@ const baseVertCode =
 		v_position = gl_Position.xy;
 		v_texCoord = a_texCoord;
 	}`
-const shader1 = new Shader(
+
+const shaderTex = new Shader(
 	//VERTEX SHADER CODE
 	baseVertCode,
 	//FRAGMENT SHADER CODE
 	`#version 300 es
 	precision mediump float;
-	out vec4 fragColor;
-
-	void main() {
-		fragColor = vec4(1,0,0,1);
-	}
-	`
-);
-
-const shader2 = new Shader(
-	//VERTEX SHADER CODE
-	baseVertCode,
-	//FRAGMENT SHADER CODE
-	`#version 300 es
-	precision mediump float;
-	layout(location = 0) out vec4 fragColor0;
-	layout(location = 1) out vec4 fragColor1;
-
-	void main() {
-		fragColor0 = vec4(0,1,0,1);
-		fragColor1 = vec4(0,0,1,1);
-	}
-	`
-);
-
-const shader3 = new Shader(
-	//VERTEX SHADER CODE
-	baseVertCode,
-	//FRAGMENT SHADER CODE
-	`#version 300 es
-	precision mediump float;
-	uniform sampler2D u_tex[2];
+	uniform sampler2D u_tex[3];
 	in vec2 v_texCoord;
 	out vec4 fragColor;
 
 	void main() {
-		fragColor = texture(u_tex[0], v_texCoord)+texture(u_tex[1], v_texCoord);
+		vec3 color = vec3(0);
+		for (int i = 1 ; i < 3 ; i++) {
+			color += texture(u_tex[i], v_texCoord).rgb;
+		}
+		fragColor = vec4(color, 1);
 	}
 	`
 );
 
-const shader4 = new Shader(
+const shaderBright = new Shader(
 	//VERTEX SHADER CODE
 	`#version 300 es
 	layout(location = 0) in vec2 a_texCoord;
@@ -136,14 +111,66 @@ const shader4 = new Shader(
 		brightColor = vec4(v_color, 1);
 	}`
 )
+
+const shaderBlurH = new Shader(
+	//VERTEX SHADER CODE
+	baseVertCode,
+	//FRAGMENT SHADER CODE
+	`#version 300 es
+	precision mediump float;
+	in vec2 v_position;
+	in vec2 v_texCoord;
+	uniform sampler2D u_tex;
 	
+	out vec4 fragColor;
 
-for (let shader of [shader1, shader2, shader3]) {
-	shader.bind();
-	gl.uniform2f(shader.uniforms.u_screen, 1, 1);
-}
-shader3.bind();
-gl.uniform1iv(shader3.uniforms.u_tex, [1,2]);
+	void main() {
+		float w[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
+		vec2 pixel = vec2(1)/vec2(textureSize(u_tex, 0));
+		pixel.y = 0.0;
+		vec3 color = texture(u_tex, v_texCoord).rgb*w[0];
+		for (int i = 1 ; i < 5 ; i++) {
+			color += texture(u_tex, v_texCoord+pixel*float(i)).rgb*w[i];
+			color += texture(u_tex, v_texCoord-pixel*float(i)).rgb*w[i];
+		}
+		fragColor = vec4(color, 1.0);
+	}`
+)
+const shaderBlurV = new Shader(
+	//VERTEX SHADER CODE
+	baseVertCode,
+	//FRAGMENT SHADER CODE
+	`#version 300 es
+	precision mediump float;
+	in vec2 v_position;
+	in vec2 v_texCoord;
+	uniform sampler2D u_tex;
+	
+	out vec4 fragColor;
 
-shader4.bind();
-gl.uniform2f(shader4.uniforms.u_screen, width/2, height/2);
+	void main() {
+		float w[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
+		vec2 pixel = vec2(1)/vec2(textureSize(u_tex, 0));
+		pixel.x = 0.0;
+		vec3 color = texture(u_tex, v_texCoord).rgb*w[0];
+		for (int i = 1 ; i < 5 ; i++) {
+			color += texture(u_tex, v_texCoord+pixel*float(i)).rgb*w[i];
+			color += texture(u_tex, v_texCoord-pixel*float(i)).rgb*w[i];
+		}
+		fragColor = vec4(color, 1.0);
+	}`
+)
+
+shaderTex.bind();
+gl.uniform2f(shaderTex.uniforms.u_screen, 1, 1);
+gl.uniform1iv(shaderTex.uniforms.u_tex, [0,1,2]);
+
+shaderBright.bind();
+gl.uniform2f(shaderBright.uniforms.u_screen, width/2, height/2);
+
+shaderBlurH.bind();
+gl.uniform2f(shaderBlurH.uniforms.u_screen, 1, 1);
+gl.uniform1i(shaderBlurH.uniforms.u_tex, 2);
+shaderBlurV.bind();
+gl.uniform2f(shaderBlurV.uniforms.u_screen, 1, 1);
+gl.uniform1i(shaderBlurV.uniforms.u_tex, 3);

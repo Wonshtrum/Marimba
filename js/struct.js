@@ -71,12 +71,12 @@ class BatchVA {
 		for (let i = 0 ; i < fixVertexBuffer.length ; i+=8) {
 			fixVertexBuffer[i + 0] = 0;
 			fixVertexBuffer[i + 1] = 0;
-			fixVertexBuffer[i + 2] = 0;
-			fixVertexBuffer[i + 3] = 1;
+			fixVertexBuffer[i + 2] = 1;
+			fixVertexBuffer[i + 3] = 0;
 			fixVertexBuffer[i + 4] = 1;
 			fixVertexBuffer[i + 5] = 1;
-			fixVertexBuffer[i + 6] = 1;
-			fixVertexBuffer[i + 7] = 0;
+			fixVertexBuffer[i + 6] = 0;
+			fixVertexBuffer[i + 7] = 1;
 		}
 		let indexBuffer = new Uint16Array(6*maxQuad);
 		let offset = 0;
@@ -169,7 +169,7 @@ class BatchVA {
 }
 
 class FrameBuffer {
-	constructor(width, height, n, tex0) {
+	constructor(width, height, n, tex0, unbind) {
 		this.tex0 = tex0 || 0;
 		this.n = n;
 		this.width = width;
@@ -184,7 +184,9 @@ class FrameBuffer {
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
 			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.attachments[i], gl.TEXTURE_2D, this.tex[i], 0);
 		}
-		this.bind();
+		if (unbind !== true) {
+			this.bind();
+		}
 	}
 	bind() {
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
