@@ -34,27 +34,35 @@ let fill = [
 	[0,0,0,0,.1,.99,0,0,0,0],
 	[0,0,0,0,0,.9,0,0,0,0]]
 R=0;
-G=.6;
-B=.45;
-gl.clearColor(0,0,0,1);
+G=.8;
+B=.75;
+gl.clearColor(0,0,0,0);
+let pside = 11;
 const render = () => {
 	b1.begin();
 	for (let i = 0 ; i < 10 ; i++) {
 		for (let j = 0 ; j < 5 ; j++) {
-			if (obj[j][i])
-				b1.drawQuad((i-5)*side,(j-2.5)*side,side,side,obj[j][i]-1,fill[j][i],R,G,B);
 			if (shaft[j][i])
 				b1.drawQuad((i-5)*side,(j-2.5)*side,side,side,3,0,0,0,0);
+			if (obj[j][i] == 5)
+				b1.drawQuad((i-5)*side,(j-2.5)*side,side,side,obj[j][i]-1,fill[j][i],0,0,0);
+			else if (obj[j][i])
+				b1.drawQuad((i-5)*side,(j-2.5)*side,side,side,obj[j][i]-1,fill[j][i],R,G,B);
+		}
+	}
+	for (let i = 0 ; i < 50 ; i++) {
+		for (let j = 0 ; j < 25 ; j++) {
+			b1.drawQuad((i-25)*pside,(j-12.5)*pside,pside,pside,5+(i+j*i+13)%9,0,R,G,B);
 		}
 	}
 	b1.drawQuad(mouse[0],mouse[1],side,side,0,.1,1,0,0);
-	b1.drawQuad(-5*side,.5*side,side*2,side*2,1,.01,R,G,B);
+	b1.drawQuad(-5*side,.5*side,side*2,side*2,1,0,R,G,B);
 	b1.drawQuad(-3*side,.5*side,side*2,side*2,0,.4,R,G,B);
-	b1.drawQuad(2*side,.5*side,side*2,side*2,0,.01,R,G,B);
+	b1.drawQuad(2*side,.5*side,side*2,side*2,0,0,R,G,B);
 	b1.drawQuad(3*side,.5*side,side*2,side*2,4,0,0,0,0);
 	b1.flush();
 	
-	for (let i = 0 ; i < 2 ; i++) {
+	for (let i = 0 ; i < 1 ; i++) {
 		fboBlur[0].bind();
 		shaderBlurH.bind();
 		va1.draw();

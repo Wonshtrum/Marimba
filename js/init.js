@@ -1,6 +1,6 @@
 //INITIALISATION
 const canvas = document.getElementById('myCan');
-let side = 54;
+let side = 55;
 
 let row = 5;
 let col = 10;

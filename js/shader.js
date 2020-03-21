@@ -64,11 +64,15 @@ const shaderTex = new Shader(
 	out vec4 fragColor;
 
 	void main() {
-		vec3 color = vec3(0);
+		/*vec3 color = vec3(0);
 		for (int i = 0 ; i < 3 ; i++) {
 			color += texture(u_tex[i], v_texCoord).rgb;
 		}
-		fragColor = vec4(color, 1);
+		fragColor = color;*/
+		vec4 bg = texture(u_tex[0], v_texCoord);
+		vec4 base = texture(u_tex[1], v_texCoord);
+		vec4 bright = texture(u_tex[2], v_texCoord);
+		fragColor = vec4(base.rgb*base.a + bg.rgb*(1.0-base.a),1)+bright;
 	}
 	`
 );
@@ -107,16 +111,26 @@ const shaderBright = new Shader(
 	layout(location = 1) out vec4 brightColor;
 
 	void main() {
-		vec2 sprite = vec2(1, int(v_fill));
-		if (1.0-v_texCoord.y < fract(v_fill)) {
-			sprite.x = 2.0;
+		int type = int(v_fill);
+		vec2 texCoord = v_texCoord;
+		if (type >= 5) {
+			type -= 5;
+			texCoord = (texCoord+vec2(type%3,type/3))/5.0;
+			type = 5;
 		}
-		baseColor = texture(u_tex, (sprite+v_texCoord)*vec2(0.25,0.2));
-		brightColor = vec4(0);
-		if (baseColor == vec4(0,1,0,1)) {
-			baseColor = vec4(v_color, 0.5);
+		vec2 sprite = vec2(0, type);
+		if (1.0-v_texCoord.y < fract(v_fill)) {
+			sprite.x = 1.0;
 			brightColor = vec4(v_color, 1);
-		} else if (fract(v_fill) > 0.0 && 0.3*baseColor.r+0.59*baseColor.g+0.11*baseColor.b > 0.6) {
+		}
+		baseColor = texture(u_tex, (sprite+texCoord)*vec2(0.5,1.0/6.0));
+		brightColor = vec4(0);
+		if (sprite.x == 1.0 && baseColor.a != 0.0) {
+			brightColor = vec4(v_color, 1);
+		}
+		if (baseColor == vec4(0,1,0,1)) {
+			baseColor = vec4(1,1,1,.5);
+		} else if (type != 3 && 0.3*baseColor.r+0.59*baseColor.g+0.11*baseColor.b > 0.6) {
 			brightColor = baseColor;
 		}
 	}`
@@ -135,8 +149,8 @@ const shaderBlurH = new Shader(
 	out vec4 fragColor;
 
 	void main() {
-		//float w[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
-		float w[5] = float[] (0.22, 0.15, 0.1, 0.09, 0.08);
+		float w[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
+		//float w[5] = float[] (0.22, 0.15, 0.1, 0.09, 0.08);
 		vec2 pixel = vec2(1)/vec2(textureSize(u_tex, 0));
 		pixel.y = 0.0;
 		vec3 color = texture(u_tex, v_texCoord).rgb*w[0];
@@ -160,8 +174,8 @@ const shaderBlurV = new Shader(
 	out vec4 fragColor;
 
 	void main() {
-		//float w[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
-		float w[5] = float[] (0.22, 0.15, 0.1, 0.09, 0.08);
+		float w[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
+		//float w[5] = float[] (0.22, 0.15, 0.1, 0.09, 0.08);
 		vec2 pixel = vec2(1)/vec2(textureSize(u_tex, 0));
 		pixel.x = 0.0;
 		vec3 color = texture(u_tex, v_texCoord).rgb*w[0];

@@ -25,4 +25,4 @@ const loadTex = (src, index) => {
 };
 
 loadTex("bg.png","bg");
-loadTex("spritesA.png","sprites");
+loadTex("sprites55.png","sprites");
