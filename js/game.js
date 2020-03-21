@@ -18,5 +18,5 @@ let xyOnMap = function(e) {
 let mouse = [0, 0];
 canvas.onmousemove = function(e) {
 	let [x, y] = xyOnMapPixel(e);
-	mouse = [x-5*side, y-2.5*side];
+	mouse = [x-5*side, y-3*side+8];
 }

@@ -50,7 +50,7 @@ class VertexArray {
 }
 
 class BatchVA {
-	constructor(maxQuad, preBind) {
+	constructor(maxQuad, onBind) {
 		//VERTEX ARRAY
 		this.va = gl.createVertexArray();
 		gl.bindVertexArray(this.va);
@@ -59,7 +59,7 @@ class BatchVA {
 		this.maxQuad = maxQuad;
 		this.quad = 0;
 		this.dataIndex = 0;
-		this.preBind = preBind;
+		this.onBind = onBind;
 
 		//CPU BUFFERS
 		//[x, y, tex.fill, r, g, b]
@@ -116,6 +116,7 @@ class BatchVA {
 	bind() {
 		gl.bindVertexArray(this.va);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ib);
+		this.onBind();
 	}
 	begin() {
 		this.quad = 0;
@@ -161,8 +162,6 @@ class BatchVA {
 		this.quad++;
 	}
 	flush() {
-		this.bind();
-		this.preBind();
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vb);
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.vertexBuffer, 0, this.dataIndex);
 		gl.drawElements(gl.TRIANGLES, 6*this.quad, gl.UNSIGNED_SHORT, 0);
