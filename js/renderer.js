@@ -36,8 +36,6 @@ let fill = [
 R=0;
 G=.8;
 B=.75;
-gl.clearColor(0,0,0,0);
-let pside = 11;
 let pipes = [
 	[[3,1,2,4,0,30],[0,-5],[4,0],[0,15]],
 	[[5,1,2,2,0,43],[0,-5],[-4,0],[0,15]],
@@ -101,11 +99,11 @@ const render = () => {
 				b1.drawQuad((i-5)*side,(j-2.5)*side,side,side,obj[j][i]-1,fill[j][i],R,G,B);
 		}
 	}
-	b1.drawQuad(Math.floor(mouse[0]/side)*side,(Math.floor(mouse[1]/side)+.5)*side,side,side,3,0,1,0,0);
 	b1.drawQuad(-5*side,.5*side,side*2,side*2,1,0,R,G,B);
 	b1.drawQuad(-3*side,.5*side,side*2,side*2,0,.4,R,G,B);
 	b1.drawQuad(2*side,.5*side,side*2,side*2,0,0,R,G,B);
 	b1.drawQuad(3*side,.5*side,side*2,side*2,4,0,0,0,0);
+	b1.drawQuad(Math.floor(mouse[0]/side)*side,(Math.floor(mouse[1]/side)+.5)*side,side,side,3,0,1,0,0);
 	b1.flush();
 	
 	for (let i = 0 ; i < 1 ; i++) {
