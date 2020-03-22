@@ -89,7 +89,7 @@ class Pipe {
 			[dx, dy] = path[i];
 			if (dx) {
 				ddx = dx > 0 ? 1 : -1;
-				if (i != 1)
+				if (i != 0)
 					this.path.push([(x-X)*pside, (y-Y)*pside, 9-ddx+3*ddy]);
 				for (let j = ddx ; j != dx ; j += ddx)
 					this.path.push([(x+j-X)*pside, (y-Y)*pside, 6]);
@@ -106,7 +106,7 @@ class Pipe {
 	}
 	draw(ctx) {
 		for (let [x, y, t] of this.path)
-			ctx.drawQuad(this.x, this.y, pside, pside, t, 0, 0, 0, 0);
+			ctx.drawQuad(x, y, pside, pside, t, 0, 0, 0, 0);
 	}
 }
 Pipe.list = [];
@@ -150,5 +150,5 @@ for (let i = 0 ; i < 10 ; i++) {
 
 for (let pipe of pipes) {
 	let [X, Y, x, y] = pipe[0];
-	new Pipe(X*5+x, Y*5+y, pipe.splice(0));
+	new Pipe(X*5+x, Y*5+y, pipe.splice(1));
 }
