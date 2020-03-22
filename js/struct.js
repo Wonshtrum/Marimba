@@ -6,12 +6,12 @@ class VertexArray {
 		gl.bindVertexArray(this.va);
 
 		//CPU BUFFERS
-		let totalSize = layout.reduce((a,b)=>a+b,0);
+		let totalSize = layout.sum();
 		this.quadCount = buffer.length/(4*totalSize);
 		this.vertexBuffer = new Float32Array(buffer);
 		let indexBuffer = new Uint16Array(6*this.quadCount);
 		let offset = 0;
-		for (let i = 0 ; i < indexBuffer.length ; i+=6) {
+		for (let i = 0 ; i < indexBuffer.length ; i += 6) {
 			indexBuffer[i + 0] = offset + 0;
 			indexBuffer[i + 1] = offset + 1;
 			indexBuffer[i + 2] = offset + 2;
@@ -64,7 +64,7 @@ class BatchVA {
 		//CPU BUFFERS
 		//[x, y, tex.fill, r, g, b]
 		let layout = [2, 1, 3]
-		let totalSize = layout.reduce((a,b)=>a+b,0);
+		let totalSize = layout.sum();
 		this.vertexBuffer = new Float32Array(totalSize*4*maxQuad);
 		//[tx, ty]
 		let fixVertexBuffer = new Float32Array(2*4*maxQuad);
@@ -169,7 +169,7 @@ class BatchVA {
 }
 
 class FrameBuffer {
-	constructor(width, height, n, tex0, unbind) {
+	constructor(width, height, n, tex0) {
 		this.tex0 = tex0 || 0;
 		this.n = n;
 		this.width = width;
@@ -183,9 +183,6 @@ class FrameBuffer {
 			this.tex[i] = defaultTex();
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
 			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.attachments[i], gl.TEXTURE_2D, this.tex[i], 0);
-		}
-		if (unbind !== true) {
-			this.bind();
 		}
 	}
 	bind() {
@@ -203,3 +200,4 @@ class FrameBuffer {
 		gl.viewport(0, 0, canvas.width, canvas.height);
 	}
 }
+const unbindAllFbo = FrameBuffer.prototype.unbind;

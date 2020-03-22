@@ -24,5 +24,5 @@ const loadTex = (src, index) => {
 	textures[index] = texture;
 };
 
-loadTex("bg.png","bg");
-loadTex("sprites55.png","sprites");
+loadTex("bg.png", "bg");
+loadTex("sprites55.png", "sprites");

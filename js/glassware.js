@@ -5,23 +5,23 @@ class Tile {
 		this.size = size;
 		this.shelf = shelf;
 		Tile.list.push(this);
-		for (let i = 0 ; i < size ; i++) {
-			for (let j = 0 ; j < size ; j++) {
+		for (let i = 0 ; i < size ; i++)
+			for (let j = 0 ; j < size ; j++)
 				Tile.mat[y+j][x+i] = this;
-			}
-		}
 	}
 	draw(ctx) {
 		if (this.shelf)
-			ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 3, 0, 0, 0, 0);
+			for (let i = 0 ; i < this.size ; i++)
+				for (let j = 0 ; j < this.size ; j++)
+					ctx.drawQuad((this.x+i)*side, (this.y+j)*side, side, side, 3, 0, 0, 0, 0);
 	}
 }
 Tile.list = [];
 Tile.mat = Array.from({length: row}, () => Array(col));
 
 class Flask extends Tile {
-	constructor(x, y, size, level, R, G, B) {
-		super(x, y, size, false);
+	constructor(x, y, size, shelf, level, R, G, B) {
+		super(x, y, size, shelf);
 		this.level = 0;
 		this.fill(level);
 		this.R = R;
@@ -61,8 +61,8 @@ class Shelf extends Tile {
 }
 
 class Spout extends Tile {
-	constructor(x, y, size, lit) {
-		super(x, y, size, false);
+	constructor(x, y, size, shelf, lit) {
+		super(x, y, size, shelf);
 		this.level = 0;
 		this.lit(lit);
 	}
@@ -121,8 +121,8 @@ let shelf = [
 	[0,0,0,0,0,0,0,0,0,0],
 	[0,0,0,0,0,1,0,1,0,0],
 	[0,0,0,1,0,1,0,1,0,0],
-	[0,0,1,1,0,1,0,1,0,0],
-	[0,0,1,1,1,1,0,1,0,0]];
+	[0,0,0,0,0,1,0,1,0,0],
+	[0,0,0,0,1,1,0,1,0,0]];
 let fill = [
 	[0,0,0,0,0,0,0,0,0,0],
 	[0,0,0,.4,0,.7,0,0,0,0],
@@ -136,17 +136,22 @@ let pipes = [
 	[[2,2,2,5,0,12],[0,-6],[-4,0],[0,-1],[1,0],[0,2],[-5,0],[0,1],[3,0],[0,1],[-2,0],[0,1],[1,0],[0,6]]
 ];
 
+let R = 0;
+let G = 0.8;
+let B = 0.75;
 let tmp;
 for (let i = 0 ; i < 10 ; i++) {
 	for (let j = 0 ; j < 5 ; j++) {
 		if (obj[j][i]) {
-			tmp = new Tile.types[obj[j][i]-1](i, j, 1, fill[j][i], 0, 0.8, 0.75);
-			if (shelf[j][i])
-				tmp.shelf = true;
+			tmp = new Tile.types[obj[j][i]-1](i, j, 1, shelf[j][i] === 1, fill[j][i], 0, 0.8, 0.75);
 		} else if (shelf[j][i])
 			new Shelf(i, j, 1);
 	}
 }
+new Bescher(0, 3, 2, false, 0, R, G, B);
+new Erlenmeyer(2, 3, 2, true, 0.4, R, G, B);
+new Erlenmeyer(7, 3, 2, false, 0, R, G, B);
+new Spout(8, 3, 2, false);
 
 for (let pipe of pipes) {
 	let [X, Y, x, y] = pipe[0];
