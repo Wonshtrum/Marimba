@@ -23,7 +23,11 @@ let dR = 0.01;
 let dG = 0.025;
 let dB = 0.03;
 let f = 0;
+let d = 10;
 const rnd = Math.random;
+for (let i = 0 ; i < 1000 ; i++)
+	new Particule(rnd()*d, rnd()*d, 2, rnd(), rnd(), rnd(), 0.8);
+
 const render = () => {
 	f++
 	R += dR;
@@ -48,9 +52,10 @@ const render = () => {
 	
 	bParticule.bind();
 	bParticule.begin();
-	let d = 100;
-	for (let i = 0 ; i < 1000 ; i++)
-		bParticule.drawQuad(rnd()*d-5,rnd()*d-5,2,2,rnd(),rnd(),rnd(),0.8);
+	for (let particule of Particule.list) {
+		particule.update();
+		particule.draw(bParticule);
+	}
 	bParticule.flush();
 	
 	for (let i = 0 ; i < 1 ; i++) {

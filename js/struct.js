@@ -302,3 +302,30 @@ class FrameBuffer {
 	}
 };
 const unbindAllFbo = FrameBuffer.prototype.unbind;
+
+class Particule {
+	constructor(x, y, s, r, g, b, a) {
+		this.x = x;
+		this.y = y;
+		this.s = s;
+		this.r = r;
+		this.g = g;
+		this.b = b;
+		this.a = a;
+		this.ax = rnd()*0.02-0.01;
+		this.ay = rnd()*0.02-0.01;
+		this.vx = 0;
+		this.vy = 0;
+		Particule.list.push(this);
+	}
+	update() {
+		this.vx += this.ax;
+		this.vy += this.ay;
+		this.x += this.vx;
+		this.y += this.vy;
+	}
+	draw(ctx) {
+		ctx.drawQuad(this.x, this.y, this.s, this.s, this.r, this.g, this.b, this.a);
+	}
+};
+Particule.list = [];
