@@ -29,28 +29,28 @@ class Flask extends Tile {
 		this.B = B;
 	}
 	fill(level) {
-		this.level = Math.min(level, 0.999);
+		this.level = Math.min(level, full);
 	}
 }
 
 class Erlenmeyer extends Flask {
 	draw(ctx) {
 		super.draw(ctx);
-		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 0, this.level, this.R, this.G, this.B);
+		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 0, this.level, R, G, B);
 	}
 }
 
 class Bescher extends Flask {
 	draw(ctx) {
 		super.draw(ctx);
-		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 1, this.level, this.R, this.G, this.B);
+		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 1, this.level, R, G, B);
 	}
 }
 
 class Distillation extends Flask {
 	draw(ctx) {
 		super.draw(ctx);
-		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 2, this.level, this.R, this.G, this.B);
+		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 2, this.level, R, G, B);
 	}
 }
 
@@ -67,7 +67,7 @@ class Spout extends Tile {
 		this.lit(lit);
 	}
 	lit(lit) {
-		this.level = lit ? 0.999 : 0;
+		this.level = lit ? full : 0;
 	}
 	draw(ctx) {
 		super.draw(ctx);
@@ -103,10 +103,27 @@ class Pipe {
 			x += dx;
 			y += dy;
 		}
+		this.path.reverse();
+		this.liquid = Array(this.path.length);
+	}
+	push(n) {
+		for (let i = 0 ; i < n ; i++)
+			this.liquid.push(true);
+	}
+	flow() {
+		this.liquid.shift(0);
+		if (this.liquid.length < this.path.length)
+			this.liquid.push(false);
 	}
 	draw(ctx) {
-		for (let [x, y, t] of this.path)
-			ctx.drawQuad(x, y, pside, pside, t, 0, 0, 0, 0);
+		let x, y, t;
+		for (let i = 0 ; i < this.path.length ; i++) {
+			[x, y, t] = this.path[i];
+			if (this.liquid[i])
+				ctx.drawQuad(x, y, pside, pside, t, full, R, G, B);
+			else
+				ctx.drawQuad(x, y, pside, pside, t, 0, 0, 0, 0);
+		}
 	}
 }
 Pipe.list = [];

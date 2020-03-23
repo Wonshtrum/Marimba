@@ -1,7 +1,7 @@
 //MAIN VARIABLES
 const canvas = document.getElementById('myCan');
-let side = 55;
-let pside = side/5;
+const side = 55;
+const pside = side/5;
 
 let row = 5;
 let col = 10;
@@ -11,8 +11,9 @@ let colH = col/2;
 let width = col*side;
 let height = row*side;
 
-let canvasScale = 1;
+const canvasScale = 1;
 
+const full = 0.999;
 //CANVAS AND WEBGL
 canvas.width = width*canvasScale;
 canvas.height = height*canvasScale;

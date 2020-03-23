@@ -16,11 +16,27 @@ let b1 = new BatchVA(2000, ()=>{
 	gl.clear(gl.COLOR_BUFFER_BIT);
 });
 
+let dR = 0.01;
+let dG = 0.025;
+let dB = 0.03;
+let f = 0;
 const render = () => {
+	f++
+	R += dR;
+	G += dG;
+	B += dB;
+	if (R>1 || R<0) dR*=-1;
+	if (G>1 || G<0) dG*=-1;
+	if (B>1 || B<0) dB*=-1;
+
 	b1.bind();
 	b1.begin();
-	for (let pipe of Pipe.list)
+	for (let pipe of Pipe.list) {
+		if (Math.random()>0.95)
+			pipe.push(Math.ceil(Math.random()*5));
+		pipe.flow();
 		pipe.draw(b1);
+	}
 	for (let tile of Tile.list)
 		tile.draw(b1);
 	b1.drawQuad(Math.floor(mouse[0]/side)*side, (Math.floor(mouse[1]/side)+.5)*side, side, side, 3, 0, 1, 0, 0);
