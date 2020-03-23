@@ -15,7 +15,7 @@ class Tile {
 				for (let j = 0 ; j < this.size ; j++)
 					ctx.drawQuad((this.x+i)*side, (this.y+j)*side, side, side, 3, 0, 0, 0, 0);
 	}
-}
+};
 Tile.list = [];
 Tile.mat = Array.from({length: row}, () => Array(col));
 
@@ -31,34 +31,34 @@ class Flask extends Tile {
 	fill(level) {
 		this.level = Math.min(level, full);
 	}
-}
+};
 
 class Erlenmeyer extends Flask {
 	draw(ctx) {
 		super.draw(ctx);
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 0, this.level, R, G, B);
 	}
-}
+};
 
 class Bescher extends Flask {
 	draw(ctx) {
 		super.draw(ctx);
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 1, this.level, R, G, B);
 	}
-}
+};
 
 class Distillation extends Flask {
 	draw(ctx) {
 		super.draw(ctx);
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 2, this.level, R, G, B);
 	}
-}
+};
 
 class Shelf extends Tile {
 	constructor(x, y, size) {
 		super(x, y, size, true);
 	}
-}
+};
 
 class Spout extends Tile {
 	constructor(x, y, size, shelf, lit) {
@@ -73,7 +73,7 @@ class Spout extends Tile {
 		super.draw(ctx);
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 4, this.level, 0, 0, 0);
 	}
-}
+};
 
 Tile.types = [Erlenmeyer, Bescher, Distillation, Shelf, Spout];
 
@@ -125,7 +125,7 @@ class Pipe {
 				ctx.drawQuad(x, y, pside, pside, t, 0, 0, 0, 0);
 		}
 	}
-}
+};
 Pipe.list = [];
 
 let obj = [

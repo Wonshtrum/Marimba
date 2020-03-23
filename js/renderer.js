@@ -6,20 +6,24 @@ let va1 = new VertexArray([
 
 //       0   1        2     3       4
 //tex = [BG, SPRITES, main, bright, tmpBlur]
-let fbo1 = new FrameBuffer(width, height, 2, 2);
-
+let fboBase = new FrameBuffer(width, height, 2, 2);
 let fboBlur = [new FrameBuffer(canvas.width, canvas.height, 1, 4), new FrameBuffer(canvas.width, canvas.height, 1, 3)];
 
-let b1 = new BatchVA(2000, ()=>{
+let bBase = new BatchBase(2000, ()=>{
 	shaderBright.bind();
-	fbo1.bind();
+	fboBase.bind();
 	gl.clear(gl.COLOR_BUFFER_BIT);
+});
+let bParticule = new BatchParticule(2000, ()=>{
+	shaderParticule.bind();
+	fboBase.bind();
 });
 
 let dR = 0.01;
 let dG = 0.025;
 let dB = 0.03;
 let f = 0;
+const rnd = Math.random;
 const render = () => {
 	f++
 	R += dR;
@@ -29,18 +33,25 @@ const render = () => {
 	if (G>1 || G<0) dG*=-1;
 	if (B>1 || B<0) dB*=-1;
 
-	b1.bind();
-	b1.begin();
+	bBase.bind();
+	bBase.begin();
 	for (let pipe of Pipe.list) {
 		if (Math.random()>0.95)
 			pipe.push(Math.ceil(Math.random()*5));
 		pipe.flow();
-		pipe.draw(b1);
+		pipe.draw(bBase);
 	}
 	for (let tile of Tile.list)
-		tile.draw(b1);
-	b1.drawQuad(Math.floor(mouse[0]/side)*side, (Math.floor(mouse[1]/side)+.5)*side, side, side, 3, 0, 1, 0, 0);
-	b1.flush();
+		tile.draw(bBase);
+	bBase.drawQuad(Math.floor(mouse[0]/side)*side, (Math.floor(mouse[1]/side)+.5)*side, side, side, 3, 0, 1, 0, 0);
+	bBase.flush();
+	
+	bParticule.bind();
+	bParticule.begin();
+	let d = 100;
+	for (let i = 0 ; i < 1000 ; i++)
+		bParticule.drawQuad(rnd()*d-5,rnd()*d-5,2,2,rnd(),rnd(),rnd(),0.8);
+	bParticule.flush();
 	
 	for (let i = 0 ; i < 1 ; i++) {
 		fboBlur[0].bind();

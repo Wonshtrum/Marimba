@@ -37,7 +37,7 @@ class Shader {
 	unbind() {
 		gl.useProgram(0);
 	}
-}
+};
 
 const baseVertCode =
 	`#version 300 es
@@ -51,7 +51,7 @@ const baseVertCode =
 		gl_Position = vec4(a_position.x/u_screen.x, a_position.y/u_screen.y, 1, 1);
 		v_position = gl_Position.xy;
 		v_texCoord = a_texCoord;
-	}`
+	}`;
 
 const shaderTex = new Shader(
 	//VERTEX SHADER CODE
@@ -129,7 +129,7 @@ const shaderBright = new Shader(
 			brightColor = baseColor;
 		}
 	}`
-)
+);
 
 const shaderBlurH = new Shader(
 	//VERTEX SHADER CODE
@@ -154,7 +154,7 @@ const shaderBlurH = new Shader(
 		}
 		fragColor = vec4(color, 1.0);
 	}`
-)
+);
 const shaderBlurV = new Shader(
 	//VERTEX SHADER CODE
 	baseVertCode,
@@ -178,7 +178,36 @@ const shaderBlurV = new Shader(
 		}
 		fragColor = vec4(color, 1.0);
 	}`
-)
+);
+
+const shaderParticule = new Shader(
+	//VERTEX SHADER CODE
+	`#version 300 es
+	layout(location = 0) in vec2 a_position;
+	layout(location = 1) in vec4 a_color;
+	uniform vec2 u_screen;
+
+	out vec4 v_color;
+
+	void main() {
+		gl_Position = vec4(a_position.x/u_screen.x, a_position.y/u_screen.y, 1, 1);
+		v_color = a_color;
+	}`,
+	//FRAGMENT SHADER CODE
+	`#version 300 es
+	precision mediump float;
+	in vec4 v_color;
+	
+	layout(location = 0) out vec4 baseColor;
+	layout(location = 1) out vec4 brightColor;
+
+	void main() {
+		baseColor = v_color;
+		brightColor = vec4(v_color.rgb, 1);
+	}`
+);
+
+	
 
 shaderTex.bind();
 gl.uniform2f(shaderTex.uniforms.u_screen, 1, 1);
@@ -194,3 +223,6 @@ gl.uniform1i(shaderBlurH.uniforms.u_tex, 3);
 shaderBlurV.bind();
 gl.uniform2f(shaderBlurV.uniforms.u_screen, 1, 1);
 gl.uniform1i(shaderBlurV.uniforms.u_tex, 4);
+
+shaderParticule.bind();
+gl.uniform2f(shaderParticule.uniforms.u_screen, width/2, height/2);

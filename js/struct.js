@@ -47,9 +47,9 @@ class VertexArray {
 		this.bind();
 		gl.drawElements(gl.TRIANGLES, 6*this.quadCount, gl.UNSIGNED_SHORT, 0);
 	}
-}
+};
 
-class BatchVA {
+class BatchBase {
 	constructor(maxQuad, onBind) {
 		//VERTEX ARRAY
 		this.va = gl.createVertexArray();
@@ -166,7 +166,108 @@ class BatchVA {
 		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.vertexBuffer, 0, this.dataIndex);
 		gl.drawElements(gl.TRIANGLES, 6*this.quad, gl.UNSIGNED_SHORT, 0);
 	}
-}
+};
+
+class BatchParticule {
+	constructor(maxQuad, onBind) {
+		//VERTEX ARRAY
+		this.va = gl.createVertexArray();
+		gl.bindVertexArray(this.va);
+
+		//BATCH
+		this.maxQuad = maxQuad;
+		this.quad = 0;
+		this.dataIndex = 0;
+		this.onBind = onBind;
+
+		//CPU BUFFERS
+		//[x, y, r, g, b, a]
+		let layout = [2, 4]
+		let totalSize = layout.sum();
+		this.vertexBuffer = new Float32Array(totalSize*4*maxQuad);
+		let indexBuffer = new Uint16Array(6*maxQuad);
+		let offset = 0;
+		for (let i = 0 ; i < indexBuffer.length ; i+=6) {
+			indexBuffer[i + 0] = offset + 0;
+			indexBuffer[i + 1] = offset + 1;
+			indexBuffer[i + 2] = offset + 2;
+
+			indexBuffer[i + 3] = offset + 0;
+			indexBuffer[i + 4] = offset + 2;
+			indexBuffer[i + 5] = offset + 3;
+
+			offset += 4;
+		}
+
+		//GPU BUFFERS
+		this.vb = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vb);
+		gl.bufferData(gl.ARRAY_BUFFER, this.vertexBuffer, gl.DYNAMIC_DRAW);
+		let stride = 0;
+		for (let i = 0 ; i < layout.length ; i++) {
+			gl.enableVertexAttribArray(i);
+			gl.vertexAttribPointer(i, layout[i], gl.FLOAT, false, totalSize*floatSize, stride*floatSize);
+			stride += layout[i];
+		}
+
+		this.ib = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ib);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexBuffer, gl.STATIC_DRAW);
+	}
+	bind() {
+		gl.bindVertexArray(this.va);
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ib);
+		this.onBind();
+	}
+	begin() {
+		this.quad = 0;
+		this.dataIndex = 0;
+	}
+	drawQuad(x, y, w, h, r, g, b, a) {
+		y -= 8;
+		if (this.quad >= this.maxQuad) {
+			this.flush();
+			this.begin();
+		}
+		this.vertexBuffer[this.dataIndex + 0] = x;
+		this.vertexBuffer[this.dataIndex + 1] = y;
+		this.vertexBuffer[this.dataIndex + 2] = r;
+		this.vertexBuffer[this.dataIndex + 3] = g;
+		this.vertexBuffer[this.dataIndex + 4] = b;
+		this.vertexBuffer[this.dataIndex + 5] = a;
+		this.dataIndex += 6;
+
+		this.vertexBuffer[this.dataIndex + 0] = x+w;
+		this.vertexBuffer[this.dataIndex + 1] = y;
+		this.vertexBuffer[this.dataIndex + 2] = r;
+		this.vertexBuffer[this.dataIndex + 3] = g;
+		this.vertexBuffer[this.dataIndex + 4] = b;
+		this.vertexBuffer[this.dataIndex + 5] = a;
+		this.dataIndex += 6;
+
+		this.vertexBuffer[this.dataIndex + 0] = x+w;
+		this.vertexBuffer[this.dataIndex + 1] = y+h;
+		this.vertexBuffer[this.dataIndex + 2] = r;
+		this.vertexBuffer[this.dataIndex + 3] = g;
+		this.vertexBuffer[this.dataIndex + 4] = b;
+		this.vertexBuffer[this.dataIndex + 5] = a;
+		this.dataIndex += 6;
+
+		this.vertexBuffer[this.dataIndex + 0] = x;
+		this.vertexBuffer[this.dataIndex + 1] = y+h;
+		this.vertexBuffer[this.dataIndex + 2] = r;
+		this.vertexBuffer[this.dataIndex + 3] = g;
+		this.vertexBuffer[this.dataIndex + 4] = b;
+		this.vertexBuffer[this.dataIndex + 5] = a;
+		this.dataIndex += 6;
+		this.quad++;
+	}
+	flush() {
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vb);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.vertexBuffer, 0, this.dataIndex);
+		gl.drawElements(gl.TRIANGLES, 6*this.quad, gl.UNSIGNED_SHORT, 0);
+	}
+};
 
 class FrameBuffer {
 	constructor(width, height, n, tex0) {
@@ -199,5 +300,5 @@ class FrameBuffer {
 		gl.drawBuffers([gl.BACK]);
 		gl.viewport(0, 0, canvas.width, canvas.height);
 	}
-}
+};
 const unbindAllFbo = FrameBuffer.prototype.unbind;
