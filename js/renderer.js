@@ -1,8 +1,8 @@
 let va1 = new VertexArray([
-	-1, -1, 0, 1,
-	 1, -1, 1, 1,
-	 1,  1, 1, 0,
-	-1,  1, 0, 0], [2, 2], gl.STATIC_DRAW);
+	0, 0, 0, 1,
+	2, 0, 1, 1,
+	2, 2, 1, 0,
+	0, 2, 0, 0], [2, 2], gl.STATIC_DRAW);
 
 //       0   1        2     3       4
 //tex = [BG, SPRITES, main, bright, tmpBlur]
@@ -22,14 +22,12 @@ let bParticule = new BatchParticule(2000, ()=>{
 let dR = 0.01;
 let dG = 0.025;
 let dB = 0.03;
-let f = 0;
 let d = 10;
 const rnd = Math.random;
 for (let i = 0 ; i < 1000 ; i++)
 	new Particule(rnd()*d, rnd()*d, 2, rnd(), rnd(), rnd(), 0.8);
 
 const render = () => {
-	f++
 	R += dR;
 	G += dG;
 	B += dB;
@@ -47,16 +45,24 @@ const render = () => {
 	}
 	for (let tile of Tile.list)
 		tile.draw(bBase);
-	bBase.drawQuad(Math.floor(mouse[0]/side)*side, (Math.floor(mouse[1]/side)+.5)*side, side, side, 3, 0, 1, 0, 0);
+
+	if (mouse.tile) {
+		bBase.drawQuad(mouse.tile.x*side, mouse.tile.y*side, mouse.tile.size*side, mouse.tile.size*side, 9, .999, .1, .2, .3);
+	}
+	if (mouse.tile && mouse.tile.anchor(mouse.px, mouse.py)) {
+		bBase.drawQuad(mouse.px*pside, mouse.py*pside, pside, pside, 9, .999, 1, 0, 0);
+	} else {
+		bBase.drawQuad(mouse.px*pside, mouse.py*pside, pside, pside, 9, .999, .4, .6, .7);
+	}
 	bBase.flush();
 	
-	bParticule.bind();
+	/*bParticule.bind();
 	bParticule.begin();
 	for (let particule of Particule.list) {
 		particule.update();
 		particule.draw(bParticule);
 	}
-	bParticule.flush();
+	bParticule.flush();*/
 	
 	for (let i = 0 ; i < 1 ; i++) {
 		fboBlur[0].bind();
@@ -78,7 +84,7 @@ const start = () => {
 	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, textures["bg"]);
 
-	setInterval(render, 30);
+	setInterval(render, 35);
 }
 
 setTimeout(start, 100);

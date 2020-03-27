@@ -1,13 +1,16 @@
 class Tile {
 	constructor(x, y, size, shelf) {
-		this.x = x-colH;
-		this.y = y-rowH;
+		this.x = x;
+		this.y = y;
 		this.size = size;
 		this.shelf = shelf;
 		Tile.list.push(this);
 		for (let i = 0 ; i < size ; i++)
 			for (let j = 0 ; j < size ; j++)
 				Tile.mat[y+j][x+i] = this;
+	}
+	anchor() {
+		return false;
 	}
 	draw(ctx) {
 		if (this.shelf)
@@ -28,12 +31,18 @@ class Flask extends Tile {
 		this.G = G;
 		this.B = B;
 	}
+	anchor(type, x, y) {
+		return type.anchors[this.size-1][y-5*this.y][x-5*this.x] === 1;
+	}
 	fill(level) {
 		this.level = Math.min(level, full);
 	}
 };
 
 class Erlenmeyer extends Flask {
+	anchor(x, y) {
+		return super.anchor(Erlenmeyer, x, y);
+	}
 	draw(ctx) {
 		super.draw(ctx);
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 0, this.level, R, G, B);
@@ -41,6 +50,9 @@ class Erlenmeyer extends Flask {
 };
 
 class Bescher extends Flask {
+	anchor(x, y) {
+		return super.anchor(Bescher, x, y);
+	}
 	draw(ctx) {
 		super.draw(ctx);
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 1, this.level, R, G, B);
@@ -48,11 +60,27 @@ class Bescher extends Flask {
 };
 
 class Distillation extends Flask {
+	anchor(x, y) {
+		return super.anchor(Distillation, x, y);
+	}
 	draw(ctx) {
 		super.draw(ctx);
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 2, this.level, R, G, B);
 	}
 };
+
+//ANCHORS FOR FLASKS
+for (let flask of [Erlenmeyer, Bescher, Distillation]) {
+	flask.anchors = [
+		Array.from({length:5}, ()=>Array(5)),
+		Array.from({length:10}, ()=>Array(10))];
+}
+for (let [x, y, s] of [[2,0,0],[4,0,1],[5,0,1]])
+	Erlenmeyer.anchors[s][y][x] = 1;
+for (let [x, y, s] of [[1,0,0],[2,0,0],[3,0,0],[3,0,1],[4,0,1],[5,0,1],[6,0,1]])
+	Bescher.anchors[s][y][x] = 1;
+for (let [x, y, s] of [[2,0,0],[1,1,0],[3,1,0],[1,4,0],[3,4,0]])
+	Distillation.anchors[s][y][x] = 1;
 
 class Shelf extends Tile {
 	constructor(x, y, size) {
@@ -81,8 +109,6 @@ class Pipe {
 	constructor(x, y, path) {
 		Pipe.list.push(this);
 		this.path = [];
-		let X = colH*5;
-		let Y = rowH*5;
 		let dx, dy, ddx, ddy;
 		ddx = ddy = 0;
 		for (let i = 0 ; i < path.length ; i++) {
@@ -90,15 +116,15 @@ class Pipe {
 			if (dx) {
 				ddx = dx > 0 ? 1 : -1;
 				if (i != 0)
-					this.path.push([(x-X)*pside, (y-Y)*pside, 9-ddx+3*ddy]);
+					this.path.push([x*pside, y*pside, 9-ddx+3*ddy]);
 				for (let j = ddx ; j != dx ; j += ddx)
-					this.path.push([(x+j-X)*pside, (y-Y)*pside, 6]);
+					this.path.push([(x+j)*pside, y*pside, 6]);
 			} else {
 				ddy = dy > 0 ? 1 : -1;
 				if (i != 0)
-					this.path.push([(x-X)*pside, (y-Y)*pside, 9+ddx-3*ddy]);
+					this.path.push([x*pside, y*pside, 9+ddx-3*ddy]);
 				for (let j = ddy ; j != dy ; j+=ddy)
-					this.path.push([(x-X)*pside, (y+j-Y)*pside, 8]);
+					this.path.push([x*pside, (y+j)*pside, 8]);
 			}
 			x += dx;
 			y += dy;

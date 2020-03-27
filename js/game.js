@@ -8,8 +8,25 @@ let xyOnCanvas = function(e) {
 	return [Math.floor(x), Math.floor(y)];
 };
 
-let mouse = [0, 0];
-canvas.onmousemove = function(e) {
-	let [x, y] = xyOnCanvas(e);
-	mouse = [x-5*side, y-3*side+8];
+let mouse = {x:0, y:0, tx:0, ty:0, px:0, py:0, tile:null, save:null};
+mouse.update = function(e) {
+	[this.x, this.y] = xyOnCanvas(e);
+	this.y = clamp(this.y+8, 0, height-1);
+	[this.tx, this.ty] = [Math.floor(this.x/side), Math.floor(this.y/side)];
+	[this.px, this.py] = [Math.floor(this.x/pside), Math.floor(this.y/pside)];
+	this.tile = Tile.mat[this.ty][this.tx];
 }
+mouse.start = function() {
+	if (!this.tile || !this.tile.anchor(this.px, this.py)) return;
+	mouse.save = {};
+	Object.assign(mouse.save, mouse);
+}
+mouse.end = function() {
+	if (!this.save) return;
+	this.save = null;
+	console.log("PIPE!");
+}
+
+canvas.onmousemove = (e) => mouse.update(e);
+canvas.onmousedown = () => mouse.start();
+canvas.onmouseup = () => mouse.end();
