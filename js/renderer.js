@@ -50,7 +50,7 @@ const render = () => {
 		bBase.drawQuad(mouse.tile.x*side, mouse.tile.y*side, mouse.tile.size*side, mouse.tile.size*side, 9, .999, .1, .2, .3);
 	}
 	if (mouse.tile && mouse.tile.anchor(mouse.px, mouse.py)) {
-		bBase.drawQuad(mouse.px*pside, mouse.py*pside, pside, pside, 9, .999, 1, 0, 0);
+		bBase.drawQuad(mouse.px*pside, mouse.py*pside, pside, pside, 9, .999, R, G, B);
 	} else {
 		bBase.drawQuad(mouse.px*pside, mouse.py*pside, pside, pside, 9, .999, .4, .6, .7);
 	}

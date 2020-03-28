@@ -106,8 +106,13 @@ class Spout extends Tile {
 Tile.types = [Erlenmeyer, Bescher, Distillation, Shelf, Spout];
 
 class Pipe {
-	constructor(x, y, path) {
-		Pipe.list.push(this);
+	constructor(x, y, path, persistent, full) {
+		if (Pipe.last)
+			Pipe.list.push(this);
+		else
+			Pipe.list[Pipe.list.length-1] = this;
+		Pipe.last = persistent;
+		this.persistent = persistent;
 		this.path = [];
 		let dx, dy, ddx, ddy;
 		ddx = ddy = 0;
@@ -130,13 +135,18 @@ class Pipe {
 			y += dy;
 		}
 		this.path.reverse();
-		this.liquid = Array(this.path.length);
+		if (full)
+			this.liquid = Array.from({length:this.path.length}, ()=>true);
+		else
+			this.liquid = Array(this.path.length);
 	}
 	push(n) {
+		if (!this.persistent) return;
 		for (let i = 0 ; i < n ; i++)
 			this.liquid.push(true);
 	}
 	flow() {
+		if (!this.persistent) return;
 		this.liquid.shift(0);
 		if (this.liquid.length < this.path.length)
 			this.liquid.push(false);
@@ -152,18 +162,20 @@ class Pipe {
 		}
 	}
 };
+Pipe.last = true;
 Pipe.list = [];
-Pipe.fromPoints = (start, end) => {
-	if (start.tile === end.tile) return;
+Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
+	if (x0 === x1 && y0 === y1) return;
 	let pad = 1;
-	let [x0, y0] = [start.px, start.py];
-	let [x1, y1] = [end.px, end.py];
 	let [ox, oy] = [x0, y0];
-	let [px0, py0] = [x0-5*start.tx, y0-5*start.ty];
-	let [px1, py1] = [x1-5*end.tx, y1-5*end.ty];
+	let [tx0, ty0] = pipeToTile(x0, y0);
+	let [tx1, ty1] = pipeToTile(x1, y1);
+	let [px0, py0] = [x0-5*tx0, y0-5*ty0];
+	let [px1, py1] = [x1-5*tx1, y1-5*ty1];
 	let path = [];
-	let tmp;
+	let tmp = [0, 0];
 
+	let full = mouse.tile && mouse.tile.anchor(mouse.px, mouse.py);
 	if (py0 == 0) {
 		oy += pad;
 		y0 -= 1;
@@ -178,15 +190,17 @@ Pipe.fromPoints = (start, end) => {
 		path.push([pad+2, 0]);
 	}
 
-	if (py1 == 0) {
-		y1 -= 1;
-		tmp = [0, pad+1];
-	} else if (px1 < 2) {
-		x1 -= 2;
-		tmp = [pad+2, 0];
-	} else if (px1 > 2) {
-		x1 += 2;
-		tmp = [-pad-2, 0];
+	if (full) {
+		if (py1 == 0) {
+			y1 -= 1;
+			tmp = [0, pad+1];
+		} else if (px1 < 2) {
+			x1 -= 2;
+			tmp = [pad+2, 0];
+		} else if (px1 > 2) {
+			x1 += 2;
+			tmp = [-pad-2, 0];
+		}
 	}
 
 	if (x0 != x1) {
@@ -201,9 +215,10 @@ Pipe.fromPoints = (start, end) => {
 		else
 			path.push([0, y1-y0]);
 	}
-	path.push(tmp);
-	console.log(ox, oy, path);
-	new Pipe(ox, oy, path);
+	if (tmp[0] !== 0 || tmp[1] !== 0) {
+		path.push(tmp);
+	}
+	new Pipe(ox, oy, path, persistent, full);
 }
 
 
@@ -251,5 +266,5 @@ new Spout(8, 3, 2, false);
 
 for (let pipe of pipes) {
 	let [X, Y, x, y] = pipe[0];
-	new Pipe(X*5+x, Y*5+y, pipe.splice(1));
+	new Pipe(X*5+x, Y*5+y, pipe.splice(1), true);
 }
