@@ -22,9 +22,10 @@ mouse.start = function() {
 	Object.assign(mouse.save, mouse);
 }
 mouse.end = function() {
-	if (!this.save) return;
+	let save = this.save;
 	this.save = null;
-	console.log("PIPE!");
+	if (!save || !this.tile || !this.tile.anchor(this.px, this.py)) return;
+	Pipe.fromPoints(save, this);
 }
 
 canvas.onmousemove = (e) => mouse.update(e);
