@@ -24,9 +24,9 @@ let dG = 0.025;
 let dB = 0.03;
 let d = 10;
 const rnd = Math.random;
-for (let i = 0 ; i < 1000 ; i++)
+/*for (let i = 0 ; i < 1000 ; i++)
 	new Particule(rnd()*d, rnd()*d, 2, rnd(), rnd(), rnd(), 0.8);
-
+*/
 const render = () => {
 	R += dR;
 	G += dG;
@@ -50,19 +50,19 @@ const render = () => {
 		bBase.drawQuad(mouse.tile.x*side, mouse.tile.y*side, mouse.tile.size*side, mouse.tile.size*side, 9, .999, .1, .2, .3);
 	}
 	if (mouse.tile && mouse.tile.anchor(mouse.px, mouse.py)) {
-		bBase.drawQuad(mouse.px*pside, mouse.py*pside, pside, pside, 9, .999, R, G, B);
+		bBase.drawQuad(mouse.px*pside, mouse.py*pside, pside, pside, 9, .999, .0, 1, .6);
 	} else {
 		bBase.drawQuad(mouse.px*pside, mouse.py*pside, pside, pside, 9, .999, .4, .6, .7);
 	}
 	bBase.flush();
 	
-	/*bParticule.bind();
+	bParticule.bind();
 	bParticule.begin();
 	for (let particule of Particule.list) {
-		particule.update();
+		//particule.update();
 		particule.draw(bParticule);
 	}
-	bParticule.flush();*/
+	bParticule.flush();
 	
 	for (let i = 0 ; i < 1 ; i++) {
 		fboBlur[0].bind();
@@ -78,13 +78,14 @@ const render = () => {
 	va1.draw();
 }
 
+let loop;
 const start = () => {
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, textures["sprites"]);
 	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, textures["bg"]);
 
-	setInterval(render, 35);
+	loop = setInterval(render, 35);
 }
 
 setTimeout(start, 100);

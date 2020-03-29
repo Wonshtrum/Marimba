@@ -21,6 +21,7 @@ class Tile {
 };
 Tile.list = [];
 Tile.mat = Array.from({length: row}, () => Array(col));
+Tile.tileFromPipe = (x, y) => Tile.mat[Math.floor(y/5)][Math.floor(x/5)];
 
 class Flask extends Tile {
 	constructor(x, y, size, shelf, level, R, G, B) {
@@ -105,6 +106,42 @@ class Spout extends Tile {
 
 Tile.types = [Erlenmeyer, Bescher, Distillation, Shelf, Spout];
 
+
+function astar(x, y, gx, gy, dx, dy, path){
+	let pile = [[x, y, 0, 0, dx, dy, path]];
+	let cache = [[x, y]];
+	let minI, minX, g, h, ddx, ddy, dir, cross, p;
+	while (pile.length) {
+		minI = pile.length-1;
+		minX = pile[minI][3];
+		for (let i = pile.length-2 ; i >= 0 ; i--) {
+			if (pile[i][3] < minX) {
+				minI = i;
+				minX = pile[i][3];
+			}
+		}
+		[x, y, g, h, ddx, ddy, p] = pile.splice(minI, 1)[0];
+		for ([dx, dy] of [[-ddy, -ddx], [ddy, ddx], [ddx, ddy]]) {
+			if (x+dx < 0 || y+dy < 0 || x+dx >= col*5 || y+dy >= row*5) continue;
+			dir = dx !== ddx || dy !== ddy ? 1 : 0;
+			cross = Pipe.mat[y+dy][x+dx]*2;
+			path = Array.from(p, e => [e[0], e[1]]);
+			if (dir) {
+				path.push([dx, dy]);
+			} else {
+				path.last()[0] += dx;
+				path.last()[1] += dy;
+			}
+			if (x+dx === gx && y+dy === gy) return path;
+			if (!Tile.tileFromPipe(x+dx,y+dy) && !cache.some(e => e[0] === x+dx && e[1] === y+dy)) {
+				pile.push([x+dx, y+dy, g+1+dir*1.5+cross, g+1+dir*1.5+cross+Math.abs(x+dx-gx)+Math.abs(y+dy-gy), dx, dy, path]);
+				cache.push([x+dx, y+dy]);
+			}
+		}
+	}
+	return null;
+}
+
 class Pipe {
 	constructor(x, y, path, persistent, full) {
 		if (Pipe.last)
@@ -134,6 +171,9 @@ class Pipe {
 			x += dx;
 			y += dy;
 		}
+		if (persistent)
+			for (let [x, y] of this.path)
+				Pipe.mat[y/pside][x/pside]++;
 		this.path.reverse();
 		if (full)
 			this.liquid = Array.from({length:this.path.length}, ()=>true);
@@ -164,6 +204,7 @@ class Pipe {
 };
 Pipe.last = true;
 Pipe.list = [];
+Pipe.mat = Array.from({length:row*5}, () => Array(col*5).fill(0));
 Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
 	if (x0 === x1 && y0 === y1) return;
 	let pad = 1;
@@ -172,6 +213,7 @@ Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
 	let [tx1, ty1] = pipeToTile(x1, y1);
 	let [px0, py0] = [x0-5*tx0, y0-5*ty0];
 	let [px1, py1] = [x1-5*tx1, y1-5*ty1];
+	let [dx, dy] = [0, -1];
 	let path = [];
 	let tmp = [0, 0];
 
@@ -183,10 +225,12 @@ Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
 	} else if (px0 < 2) {
 		ox += pad;
 		x0 -= 2;
+		[dx, dy] = [-1, 0];
 		path.push([-pad-2, 0]);
 	} else if (px0 > 2) {
 		ox -= pad;
 		x0 += 2;
+		[dx, dy] = [1, 0];
 		path.push([pad+2, 0]);
 	}
 
@@ -203,21 +247,19 @@ Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
 		}
 	}
 
-	if (x0 != x1) {
-		if (path.last()[0])
-			path.last()[0] += x1-x0;
-		else
-			path.push([x1-x0, 0]);
+	path = astar(x0, y0, x1, y1, dx, dy, path);
+	if (path === null) {
+		if (!Pipe.last) {
+			Pipe.last = true;
+			Pipe.list.pop();
+		}
+		return;
 	}
-	if (y0 != y1) {
-		if (tmp[1])
-			tmp[1] += y1-y0;
-		else
-			path.push([0, y1-y0]);
-	}
-	if (tmp[0] !== 0 || tmp[1] !== 0) {
+	if (tmp[0] === path.last()[0] || tmp[1] === path.last()[1]) {
+		path.last()[0] += tmp[0];
+		path.last()[1] += tmp[1];
+	} else
 		path.push(tmp);
-	}
 	new Pipe(ox, oy, path, persistent, full);
 }
 
@@ -243,7 +285,6 @@ let fill = [
 let pipes = [
 	[[3,1,2,4],[0,-5],[4,0],[0,15]],
 	[[5,1,2,2],[0,-5],[-4,0],[0,15]],
-	[[5,3,2,4],[5,0],[0,1],[-1,0],[0,-2],[2,0],[0,-5],[-1,0],[0,4],[2,0],[0,-1],[-7,0]],
 	[[2,2,2,5],[0,-6],[-4,0],[0,-1],[1,0],[0,2],[-5,0],[0,1],[3,0],[0,1],[-2,0],[0,1],[1,0],[0,6]]
 ];
 
