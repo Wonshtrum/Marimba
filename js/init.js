@@ -25,6 +25,19 @@ const nbSlots = 5;
 let mouse;
 for (let i = 0 ; i < nbSlots ; i++) {
 	let slot = document.createElement("div");
+	slot.setCount = function(count) {
+		this.count = count;
+		if (this.count === -1) {
+			slot.slotCount.classList.remove("show");
+			slot.slotCount.innerHTML = "";
+		} else {
+			slot.slotCount.classList.add("show");
+			slot.slotCount.innerHTML = this.count;
+		}
+	}
+	slot.use = function() {
+		this.setCount(this.count--);
+	}
 	slot.classList.add("slot");
 	slot.onclick = () => select(i);
 	slots.appendChild(slot);
@@ -35,12 +48,16 @@ for (let i = 0 ; i < nbSlots ; i++) {
 	img.style.objectPosition = 100*i/(nbSlots-1)+"% 0";
 	img.ondragstart = () => false;
 	slot.appendChild(img);
-	
+
+	let slotCount = document.createElement("div");
+	slotCount.classList.add("count");
+	slot.appendChild(slotCount);
+	slot.slotCount = slotCount;
+
 	if (i > 0) {
-		let slotCount = document.createElement("div");
-		slotCount.classList.add("count");
-		slotCount.innerHTML = i;
-		slot.appendChild(slotCount);
+		slot.setCount(i);
+	} else {
+		slot.setCount(-1);
 	}
 }
 const select = slot => {

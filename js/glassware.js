@@ -1,3 +1,12 @@
+const validPosition = (x, y, size) => {
+	let base = y+size;
+	if (base == row) return true;
+	for (let i = 0 ; i < size ; i++) {
+		if (!Tile.mat[base][x+i] || !Tile.mat[base][x+i].shelf) return false;
+	}
+	return true;
+}
+
 class Tile {
 	constructor(x, y, size, shelf) {
 		this.x = x;
@@ -13,12 +22,7 @@ class Tile {
 		return false;
 	}
 	validPosition() {
-		let base = this.y+this.size;
-		if (base == row) return true;
-		for (let i = 0 ; i < this.size ; i++) {
-			if (!Tile.mat[base][this.x+i] || !Tile.mat[base][this.x+i].shelf) return false;
-		}
-		return true;
+		return validPosition(this.x, this.y, this.size);
 	}
 	draw(ctx) {
 		if (this.shelf)
@@ -123,15 +127,17 @@ class Spout extends Tile {
 		this.fill = lit ? full : 0;
 	}
 	draw(ctx) {
-		this.tick++;
-		if (this.tick >= this.perFrame) {
-			this.tick = 0;
-			this.frame++;
-			if (this.frame >= this.maxFrame) this.frame = 0;
+		if (this.fill) {
+			this.tick++;
+			if (this.tick >= this.perFrame) {
+				this.tick = 0;
+				this.frame++;
+				if (this.frame >= this.maxFrame) this.frame = 0;
+			}
+			ctx.drawQuad(this.x*side+22*this.size, this.y*side+21*this.size, this.size*pside, this.size*pside, 20+this.frame, 0, 0, 0, 0);
 		}
 		super.draw(ctx);
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 4, this.fill, 0, 0, 0);
-		ctx.drawQuad(this.x*side+22*this.size, this.y*side+21*this.size, this.size*pside, this.size*pside, 20+this.frame, 0, 0, 0, 0);
 	}
 };
 

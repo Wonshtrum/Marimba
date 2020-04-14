@@ -24,16 +24,19 @@ mouse.update = function(e) {
 	if (oldpx === this.px && oldpy === this.py) return;
 	[this.tx, this.ty] = posToTile(this.x, this.y);
 	this.tile = Tile.mat[this.ty][this.tx];
-	if (this.save)
+	if (this.selected === 0 && this.save) {
 		Pipe.fromPoints(this.save.px, this.save.py, this.px, this.py, false);
+	} else if (this.selected === 3) {
+		this.isValidPosition = (this.tile && !this.tile.shelf) || (!this.tile && validPosition(this.tx, this.ty, this.size));
+	} else if (this.selected !== 0) {
+		this.isValidPosition = !this.tile && validPosition(this.tx, this.ty, this.size);
+	}
 };
 mouse.start = function() {
 	if (this.selected === 0) {
 		if (!this.tile || this.tile.anchor(this.px, this.py) !== 1) return;
 		mouse.save = {};
 		Object.assign(mouse.save, mouse);
-	} else {
-
 	}
 };
 mouse.end = function() {
@@ -46,13 +49,23 @@ mouse.end = function() {
 		}
 		if (!this.tile || !this.tile.anchor(this.px, this.py)) return;
 		Pipe.fromPoints(save.px, save.py, this.px, this.py, true);
-	} else if (this.selected !== 0) {
+	} else if (this.selected === 3 && this.isValidPosition && this.tile) {
+		this.tile.shelf = true;
+	} else if (this.selected !== 0 && this.isValidPosition) {
 		new Tile.types[this.selected](this.tx, this.ty, 1, false, 0, R, G, B);
 	}
+	if (this.isValidPosition) {
+		slots.children[this.selected].use();
+	}
+	this.isValidPosition = false;
 };
 mouse.drawRect = function(ctx) {
 	if (this.selected !== 0) {
-		ctx.drawQuad(this.tx*side, this.ty*side, this.size*side, this.size*side, 9, full, 0.1, 0.2, 0.3);
+		if (this.isValidPosition) {
+			ctx.drawQuad(this.tx*side, this.ty*side, this.size*side, this.size*side, 9, full, 0, 0.5, 0.3);
+		} else {
+			ctx.drawQuad(this.tx*side, this.ty*side, this.size*side, this.size*side, 9, full, 0.1, 0.2, 0.3);
+		}
 	} else if (this.tile) {
 		ctx.drawQuad(this.tile.x*side, this.tile.y*side, this.tile.size*side, this.tile.size*side, 9, full, 0.1, 0.2, 0.3);
 	}
@@ -70,6 +83,7 @@ mouse.draw = function(ctx) {
 		ctx.drawQuad(this.tx*side, this.ty*side, side, side, this.selected, 0, 0.4, .6, 0.7);
 	}
 };
+
 select(0);
 updateCanvasOffset();
 
