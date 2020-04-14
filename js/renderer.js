@@ -24,9 +24,9 @@ let dG = 0.025;
 let dB = 0.03;
 let d = 10;
 const rnd = Math.random;
-/*for (let i = 0 ; i < 1000 ; i++)
+for (let i = 0 ; i < 0 ; i++)
 	new Particule(rnd()*d, rnd()*d, 2, rnd(), rnd(), rnd(), 0.8);
-*/
+
 const render = () => {
 	R += dR;
 	G += dG;
@@ -37,6 +37,11 @@ const render = () => {
 
 	bBase.bind();
 	bBase.begin();
+
+	if (mouse.tile) {
+		bBase.drawQuad(mouse.tile.x*side, mouse.tile.y*side, mouse.tile.size*side, mouse.tile.size*side, 9, full, .1, .2, .3);
+	}
+
 	for (let pipe of Pipe.list) {
 		if (Math.random()>0.95)
 			pipe.push(Math.ceil(Math.random()*5));
@@ -46,20 +51,13 @@ const render = () => {
 	for (let tile of Tile.list)
 		tile.draw(bBase);
 
-	if (mouse.tile) {
-		bBase.drawQuad(mouse.tile.x*side, mouse.tile.y*side, mouse.tile.size*side, mouse.tile.size*side, 9, .999, .1, .2, .3);
-	}
-	if (mouse.tile && mouse.tile.anchor(mouse.px, mouse.py)) {
-		bBase.drawQuad(mouse.px*pside, mouse.py*pside, pside, pside, 9, .999, .0, 1, .6);
-	} else {
-		bBase.drawQuad(mouse.px*pside, mouse.py*pside, pside, pside, 9, .999, .4, .6, .7);
-	}
+	mouse.draw(bBase);
 	bBase.flush();
 	
 	bParticule.bind();
 	bParticule.begin();
 	for (let particule of Particule.list) {
-		//particule.update();
+		particule.update();
 		particule.draw(bParticule);
 	}
 	bParticule.flush();

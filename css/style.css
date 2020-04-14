@@ -2,12 +2,58 @@ html, body {
 	width: 100%;
 	height: 100%;
 	margin: 0;
+	background-color: black;
+	--scaleX: 0.9;
 }
 
-canvas{
+#main {
+	position: absolute;
+	width: 100%;
+	height: calc(45vw * var(--scaleX));
+	margin: auto;
+	top: 0;
+	bottom: 0;
+	text-align: center;
+}
+.crisp * {
 	image-rendering: -moz-crisp-edges;
 	image-rendering: -webkit-crisp-edges;
 	image-rendering: pixelated;
 	image-rendering: crisp-edges;
-	height: 550px;
+}
+
+canvas{
+	width: calc(90vw * var(--scaleX));
+	display: inline-block;
+}
+
+#slots {
+	display: inline-block;
+	background: black;
+}
+.slot {
+	position: relative;
+	height: calc(9vw * var(--scaleX));
+	width: calc(9vw * var(--scaleX));
+}
+
+.slot img {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	margin: auto;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	transition: width 0.1s, height 0.1s;
+}
+.slot:hover img {
+	width: 80%;
+	height: 80%;
+}
+.slot.selected img {
+	width: 90%;
+	height: 90%;
 }

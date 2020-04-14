@@ -1,5 +1,8 @@
 //MAIN VARIABLES
+const main = document.getElementById("main");
 const canvas = document.getElementById('myCan');
+const slots = document.getElementById("slots");
+
 const side = 55;
 const pside = side/5;
 
@@ -12,8 +15,32 @@ let width = col*side;
 let height = row*side;
 
 const canvasScale = 1;
-
 const full = 0.999;
+const bigShelf = true;
+const nbSlots = 5;
+
+//DOM
+let mouse;
+for (let i = 0 ; i < nbSlots ; i++) {
+	let slot = document.createElement("div");
+	slot.classList.add("slot");
+	slot.onclick = () => select(i);
+
+	let img = document.createElement("img");
+	img.src = "img/slots.png";
+	img.style.objectPosition = 100*i/(nbSlots-1)+"% 0";
+
+	slot.appendChild(img);
+	slots.appendChild(slot);
+}
+const select = slot => {
+	for (let i = 0 ; i < nbSlots ; i++) {
+		slots.children[i].classList.remove("selected");
+	}
+	mouse.selected = slot;
+	slots.children[slot].classList.add("selected");
+}
+
 //CANVAS AND WEBGL
 canvas.width = width*canvasScale;
 canvas.height = height*canvasScale;

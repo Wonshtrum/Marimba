@@ -12,11 +12,23 @@ class Tile {
 	anchor() {
 		return false;
 	}
+	validPosition() {
+		let base = this.y+this.size;
+		if (base == row) return true;
+		for (let i = 0 ; i < this.size ; i++) {
+			if (!Tile.mat[base][this.x+i] || !Tile.mat[base][this.x+i].shelf) return false;
+		}
+		return true;
+	}
 	draw(ctx) {
 		if (this.shelf)
-			for (let i = 0 ; i < this.size ; i++)
-				for (let j = 0 ; j < this.size ; j++)
-					ctx.drawQuad((this.x+i)*side, (this.y+j)*side, side, side, 3, 0, 0, 0, 0);
+			if (bigShelf) {
+				ctx.drawQuad(this.x*side, this.y*side, side*this.size, side*this.size, 3, 0, 0, 0, 0);
+			} else {
+				for (let i = 0 ; i < this.size ; i++)
+					for (let j = 0 ; j < this.size ; j++)
+						ctx.drawQuad((this.x+i)*side, (this.y+j)*side, side, side, 3, 0, 0, 0, 0);
+			}
 	}
 };
 Tile.list = [];
@@ -27,16 +39,18 @@ class Flask extends Tile {
 	constructor(x, y, size, shelf, level, R, G, B) {
 		super(x, y, size, shelf);
 		this.level = 0;
-		this.fill(level);
+		this.fill = 0;
+		this.setLevel(level);
 		this.R = R;
 		this.G = G;
 		this.B = B;
 	}
 	anchor(type, x, y) {
-		return type.anchors[this.size-1][y-5*this.y][x-5*this.x] === 1;
+		return type.anchors[this.size-1][y-5*this.y][x-5*this.x];
 	}
-	fill(level) {
-		this.level = Math.min(level, full);
+	setLevel(level) {
+		this.level = level
+		this.fill = 0.6*level/(6*this.size*this.size);
 	}
 };
 
@@ -46,7 +60,7 @@ class Erlenmeyer extends Flask {
 	}
 	draw(ctx) {
 		super.draw(ctx);
-		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 0, this.level, R, G, B);
+		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 0, this.fill, R, G, B);
 	}
 };
 
@@ -56,7 +70,7 @@ class Bescher extends Flask {
 	}
 	draw(ctx) {
 		super.draw(ctx);
-		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 1, this.level, R, G, B);
+		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 1, this.fill, R, G, B);
 	}
 };
 
@@ -64,9 +78,14 @@ class Distillation extends Flask {
 	anchor(x, y) {
 		return super.anchor(Distillation, x, y);
 	}
+	setLevel(level) {
+		this.level = level
+		if (level > 3) level += 2
+		this.fill = 0.6*level/(6*this.size*this.size);
+	}
 	draw(ctx) {
+		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 2, this.fill, R, G, B);
 		super.draw(ctx);
-		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 2, this.level, R, G, B);
 	}
 };
 
@@ -76,12 +95,12 @@ for (let flask of [Erlenmeyer, Bescher, Distillation]) {
 		Array.from({length:5}, ()=>Array(5)),
 		Array.from({length:10}, ()=>Array(10))];
 }
-for (let [x, y, s] of [[2,0,0],[4,0,1],[5,0,1]])
-	Erlenmeyer.anchors[s][y][x] = 1;
-for (let [x, y, s] of [[1,0,0],[2,0,0],[3,0,0],[3,0,1],[4,0,1],[5,0,1],[6,0,1]])
-	Bescher.anchors[s][y][x] = 1;
-for (let [x, y, s] of [[2,0,0],[1,1,0],[3,1,0],[1,4,0],[3,4,0]])
-	Distillation.anchors[s][y][x] = 1;
+for (let [x, y, s, t] of [[2,0,0,1],[4,0,1,1],[5,0,1,1]])
+	Erlenmeyer.anchors[s][y][x] = t;
+for (let [x, y, s, t] of [[1,0,0,-1],[2,0,0,1],[3,0,0,-1],[3,0,1,-1],[4,0,1,1],[5,0,1,1],[6,0,1,-1]])
+	Bescher.anchors[s][y][x] = t;
+for (let [x, y, s, t] of [[2,0,0,1],[1,1,0,-1],[3,1,0,-1],[1,4,0,-1],[3,4,0,-1]])
+	Distillation.anchors[s][y][x] = t;
 
 class Shelf extends Tile {
 	constructor(x, y, size) {
@@ -93,14 +112,26 @@ class Spout extends Tile {
 	constructor(x, y, size, shelf, lit) {
 		super(x, y, size, shelf);
 		this.level = 0;
+		this.fill = 0;
 		this.lit(lit);
+		this.tick = 0;
+		this.frame = 0;
+		this.perFrame = 4;
+		this.maxFrame = 7;
 	}
 	lit(lit) {
-		this.level = lit ? full : 0;
+		this.fill = lit ? full : 0;
 	}
 	draw(ctx) {
+		this.tick++;
+		if (this.tick >= this.perFrame) {
+			this.tick = 0;
+			this.frame++;
+			if (this.frame >= this.maxFrame) this.frame = 0;
+		}
 		super.draw(ctx);
-		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 4, this.level, 0, 0, 0);
+		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 4, this.fill, 0, 0, 0);
+		ctx.drawQuad(this.x*side+22*this.size, this.y*side+21*this.size, this.size*pside, this.size*pside, 20+this.frame, 0, 0, 0, 0);
 	}
 };
 
@@ -124,7 +155,7 @@ function astar(x, y, gx, gy, dx, dy, path){
 		for ([dx, dy] of [[-ddy, -ddx], [ddy, ddx], [ddx, ddy]]) {
 			if (x+dx < 0 || y+dy < 0 || x+dx >= col*5 || y+dy >= row*5) continue;
 			dir = dx !== ddx || dy !== ddy ? 1 : 0;
-			cross = Pipe.mat[y+dy][x+dx]*2;
+			cross = Pipe.mat[y+dy][x+dx]*10;
 			path = Array.from(p, e => [e[0], e[1]]);
 			if (dir) {
 				path.push([dx, dy]);
@@ -134,7 +165,7 @@ function astar(x, y, gx, gy, dx, dy, path){
 			}
 			if (x+dx === gx && y+dy === gy) return path;
 			if (!Tile.tileFromPipe(x+dx,y+dy) && !cache.some(e => e[0] === x+dx && e[1] === y+dy)) {
-				pile.push([x+dx, y+dy, g+1+dir*1.5+cross, g+1+dir*1.5+cross+Math.abs(x+dx-gx)+Math.abs(y+dy-gy), dx, dy, path]);
+				pile.push([x+dx, y+dy, g+1+dir*1.8+cross, g+1+dir*1.8+cross+Math.abs(x+dx-gx)+Math.abs(y+dy-gy), dx, dy, path]);
 				cache.push([x+dx, y+dy]);
 			}
 		}
@@ -263,25 +294,30 @@ Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
 	new Pipe(ox, oy, path, persistent, full);
 }
 
-
 let obj = [
 	[0,0,0,0,0,0,0,0,0,0],
 	[0,0,0,1,0,3,0,3,0,0],
 	[0,0,2,0,0,3,0,3,0,0],
-	[0,0,0,0,2,3,0,3,0,0],
+	[2,0,1,0,2,3,0,1,0,0],
 	[0,0,0,0,0,5,0,0,0,0]];
+let big = [
+	[0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0],
+	[1,0,1,0,0,0,0,1,0,0],
+	[0,0,0,0,0,0,0,0,0,0]];
 let shelf = [
 	[0,0,0,0,0,0,0,0,0,0],
 	[0,0,0,0,0,1,0,1,0,0],
 	[0,0,0,1,0,1,0,1,0,0],
-	[0,0,0,0,0,1,0,1,0,0],
-	[0,0,0,0,1,1,0,1,0,0]];
+	[0,0,1,0,0,1,0,1,0,0],
+	[0,0,0,0,1,1,0,0,0,0]];
 let fill = [
 	[0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,.4,0,.7,0,0,0,0],
-	[0,0,.2,0,0,1,0,0,0,0],
-	[0,0,0,0,.1,1,0,0,0,0],
-	[0,0,0,0,0,.9,0,0,0,0]];
+	[0,0,0,3,0,6,0,0,0,0],
+	[0,0,5,0,0,6,0,0,0,0],
+	[7,0,22,0,2,6,0,0,0,0],
+	[0,0,0,0,0,1,0,0,0,0]];
 let pipes = [
 	[[3,1,2,4],[0,-5],[4,0],[0,15]],
 	[[5,1,2,2],[0,-5],[-4,0],[0,15]],
@@ -291,20 +327,14 @@ let pipes = [
 let R = 0;
 let G = 0.8;
 let B = 0.75;
-let tmp;
 for (let i = 0 ; i < 10 ; i++) {
 	for (let j = 0 ; j < 5 ; j++) {
 		if (obj[j][i]) {
-			tmp = new Tile.types[obj[j][i]-1](i, j, 1, shelf[j][i] === 1, fill[j][i], 0, 0.8, 0.75);
+			new Tile.types[obj[j][i]-1](i, j, big[j][i]+1, shelf[j][i] === 1, fill[j][i], R, G, B);
 		} else if (shelf[j][i])
 			new Shelf(i, j, 1);
 	}
 }
-new Bescher(0, 3, 2, false, 0, R, G, B);
-new Erlenmeyer(2, 3, 2, true, 0.4, R, G, B);
-new Erlenmeyer(7, 3, 2, false, 0, R, G, B);
-new Spout(8, 3, 2, false);
-
 for (let pipe of pipes) {
 	let [X, Y, x, y] = pipe[0];
 	new Pipe(X*5+x, Y*5+y, pipe.splice(1), true);

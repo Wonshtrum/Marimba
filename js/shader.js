@@ -116,12 +116,11 @@ const shaderBright = new Shader(
 		vec2 sprite = vec2(0, type);
 		if (1.0-v_texCoord.y < fract(v_fill)) {
 			sprite.x = 1.0;
-			brightColor = vec4(v_color, 1);
 		}
-		baseColor = texture(u_tex, (sprite+texCoord)*vec2(0.5, 1.0/6.0));
+		baseColor = texture(u_tex, (sprite+texCoord)*vec2(0.5, 1.0/7.0));
 		brightColor = vec4(0);
 		if (sprite.x == 1.0 && baseColor.a != 0.0) {
-			brightColor = vec4(v_color, 1);
+			brightColor = vec4(v_color, 0.7);
 		}
 		if (baseColor == vec4(0, 1, 0, 1)) {
 			baseColor = vec4(1, 1, 1, 0.5);
