@@ -1,4 +1,11 @@
-const validPosition = (x, y, size) => {
+const validPosition = (x, y, size, inPlace) => {
+	if (!inPlace) {
+		for (let i = 0 ; i < size ; i++) {
+			for (let j = 0 ; j < size ; j++) {
+				if (Tile.mat[y+j][x+i]) return false;
+			}
+		}
+	}
 	let base = y+size;
 	if (base == row) return true;
 	for (let i = 0 ; i < size ; i++) {
@@ -22,7 +29,7 @@ class Tile {
 		return false;
 	}
 	validPosition() {
-		return validPosition(this.x, this.y, this.size);
+		return validPosition(this.x, this.y, this.size, true);
 	}
 	draw(ctx) {
 		if (this.shelf)

@@ -19,6 +19,7 @@ let height = row*side;
 const canvasScale = 1;
 const full = 0.999;
 const bigShelf = true;
+const usesPerSize = 1;
 const nbSlots = 5;
 
 //DOM
@@ -27,7 +28,7 @@ for (let i = 0 ; i < nbSlots ; i++) {
 	let slot = document.createElement("div");
 	slot.setCount = function(count) {
 		this.count = count;
-		if (this.count === -1) {
+		if (this.count < 0) {
 			slot.slotCount.classList.remove("show");
 			slot.slotCount.innerHTML = "";
 		} else {
@@ -35,8 +36,10 @@ for (let i = 0 ; i < nbSlots ; i++) {
 			slot.slotCount.innerHTML = this.count;
 		}
 	}
-	slot.use = function() {
-		this.setCount(this.count--);
+	slot.use = function(times) {
+		if (this.count < 0) return;
+		times = times || 1;
+		this.setCount(this.count-times);
 	}
 	slot.classList.add("slot");
 	slot.onclick = () => select(i);
@@ -55,15 +58,21 @@ for (let i = 0 ; i < nbSlots ; i++) {
 	slot.slotCount = slotCount;
 
 	if (i > 0) {
-		slot.setCount(i);
+		slot.setCount(i*3);
 	} else {
 		slot.setCount(-1);
 	}
+	slot.big = (i === 1 || i === 3);
+	slot.size = 1;
 }
 const select = slot => {
 	for (let i = 0 ; i < nbSlots ; i++) {
 		slots.children[i].classList.remove("selected");
 	}
+	if (slots.children[slot].count === 0) {
+		slot = 0;
+	}
+	mouse.size = slots.children[slot].size;
 	mouse.selected = slot;
 	slots.children[slot].classList.add("selected");
 }

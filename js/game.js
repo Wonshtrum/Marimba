@@ -15,22 +15,41 @@ const posToPipe = (x, y) => [Math.floor(x/pside), Math.floor(y/pside)];
 const posToTile = (x, y) => [Math.floor(x/side), Math.floor(y/side)];
 const pipeToTile = (x, y) => [Math.floor(x/5), Math.floor(y/5)];
 
-mouse = {x:0, y:0, tx:0, ty:0, px:0, py:0, tile:null, save:null, selected:0, size:1};
-mouse.update = function(e) {
-	[this.x, this.y] = xyOnCanvas(e);
-	this.y = clamp(this.y, 0, height-1);
-	let [oldpx, oldpy] = [this.px, this.py];
-	[this.px, this.py] = posToPipe(this.x, this.y);
-	if (oldpx === this.px && oldpy === this.py) return;
-	[this.tx, this.ty] = posToTile(this.x, this.y);
-	this.tile = Tile.mat[this.ty][this.tx];
+mouse = {rx:0, ry:0, x:0, y:0, tx:0, ty:0, px:0, py:0, tile:null, save:null, selected:0, size:1};
+mouse.slot = function() {
+	return slots.children[this.selected];
+}
+mouse.update = function() {
+	let slot = this.slot();
+	if (slot.size === 2 && slot.count < 2*usesPerSize) {
+		slot.size = 1;
+	} if (slot.count === 0) {
+		select(0);
+	}
+	this.size = this.slot().size;
+	this.calculate();
+}
+mouse.checkValid = function() {
 	if (this.selected === 0 && this.save) {
 		Pipe.fromPoints(this.save.px, this.save.py, this.px, this.py, false);
 	} else if (this.selected === 3) {
-		this.isValidPosition = (this.tile && !this.tile.shelf) || (!this.tile && validPosition(this.tx, this.ty, this.size));
+		this.isValidPosition = (this.tile && !this.tile.shelf && this.tile.size === this.size && this.tile.x === this.tx && this.tile.y === this.ty) || validPosition(this.tx, this.ty, this.size);
 	} else if (this.selected !== 0) {
-		this.isValidPosition = !this.tile && validPosition(this.tx, this.ty, this.size);
+		this.isValidPosition = validPosition(this.tx, this.ty, this.size);
 	}
+};
+mouse.move = function(e) {
+	[this.rx, this.ry] = xyOnCanvas(e);
+	this.calculate();
+};
+mouse.calculate = function() {
+	this.y = clamp(this.ry, 0, height-1-(this.size-1)*side);
+	this.x = clamp(this.rx, 0, width-1-(this.size-1)*side);
+	let [oldpx, oldpy] = [this.px, this.py];
+	[this.px, this.py] = posToPipe(this.x, this.y);
+	[this.tx, this.ty] = posToTile(this.x, this.y);
+	this.tile = Tile.mat[this.ty][this.tx];
+	this.checkValid();
 };
 mouse.start = function() {
 	if (this.selected === 0) {
@@ -52,13 +71,24 @@ mouse.end = function() {
 	} else if (this.selected === 3 && this.isValidPosition && this.tile) {
 		this.tile.shelf = true;
 	} else if (this.selected !== 0 && this.isValidPosition) {
-		new Tile.types[this.selected](this.tx, this.ty, 1, false, 0, R, G, B);
+		new Tile.types[this.selected](this.tx, this.ty, this.size, false, 0, R, G, B);
 	}
 	if (this.isValidPosition) {
-		slots.children[this.selected].use();
+		this.slot().use(this.size*usesPerSize);
 	}
-	this.isValidPosition = false;
+	this.update();
 };
+mouse.wheel = function(e) {
+	let slot = this.slot();
+	if (!slot.big) return;
+	if (e.deltaY > 0) {
+		slot.size = 2;
+	} else {
+		slot.size = 1;
+	}
+	this.update();
+};
+
 mouse.drawRect = function(ctx) {
 	if (this.selected !== 0) {
 		if (this.isValidPosition) {
@@ -80,7 +110,7 @@ mouse.draw = function(ctx) {
 			ctx.drawQuad(this.px*pside, this.py*pside, pside, pside, 9, full, 0.4, .6, 0.7);
 		}
 	} else {
-		ctx.drawQuad(this.tx*side, this.ty*side, side, side, this.selected, 0, 0.4, .6, 0.7);
+		ctx.drawQuad(this.tx*side, this.ty*side, this.size*side, this.size*side, this.selected, 0, 0.4, .6, 0.7);
 	}
 };
 
@@ -88,6 +118,7 @@ select(0);
 updateCanvasOffset();
 
 window.onresize = updateCanvasOffset;
-document.onmousemove = (e) => mouse.update(e);
+document.onmousemove = (e) => mouse.move(e);
 document.onmousedown = () => mouse.start();
 document.onmouseup = () => mouse.end();
+document.onwheel = (e) => mouse.wheel(e);
