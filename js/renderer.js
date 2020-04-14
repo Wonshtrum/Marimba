@@ -37,10 +37,7 @@ const render = () => {
 
 	bBase.bind();
 	bBase.begin();
-
-	if (mouse.tile) {
-		bBase.drawQuad(mouse.tile.x*side, mouse.tile.y*side, mouse.tile.size*side, mouse.tile.size*side, 9, full, .1, .2, .3);
-	}
+	mouse.drawRect(bBase);
 
 	for (let pipe of Pipe.list) {
 		if (Math.random()>0.95)
@@ -62,7 +59,7 @@ const render = () => {
 	}
 	bParticule.flush();
 	
-	for (let i = 0 ; i < 1 ; i++) {
+	for (let i = 0 ; i < 2 ; i++) {
 		fboBlur[0].bind();
 		shaderBlurH.bind();
 		va1.draw();

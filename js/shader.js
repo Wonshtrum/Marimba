@@ -64,7 +64,7 @@ const shaderTex = new Shader(
 	out vec4 fragColor;
 
 	void main() {
-		vec4 bg = texture(u_tex[0], v_texCoord);
+		vec4 bg = vec4(0.055,0.051,0.122,1);//texture(u_tex[0], v_texCoord);
 		vec4 base = texture(u_tex[1], v_texCoord);
 		vec4 bright = texture(u_tex[2], v_texCoord);
 		fragColor = vec4(base.rgb*base.a + bg.rgb*(1.0-base.a), 1)+bright;

@@ -2,10 +2,12 @@
 const main = document.getElementById("main");
 const canvas = document.getElementById('myCan');
 const slots = document.getElementById("slots");
+const background = document.getElementById("background");
 
 const side = 55;
 const pside = side/5;
-
+const xOffset = 0;
+const yOffset = 0;
 let row = 5;
 let col = 10;
 let rowH = row/2;
@@ -25,13 +27,21 @@ for (let i = 0 ; i < nbSlots ; i++) {
 	let slot = document.createElement("div");
 	slot.classList.add("slot");
 	slot.onclick = () => select(i);
+	slots.appendChild(slot);
 
 	let img = document.createElement("img");
+	img.classList.add("centered");
 	img.src = "img/slots.png";
 	img.style.objectPosition = 100*i/(nbSlots-1)+"% 0";
-
+	img.ondragstart = () => false;
 	slot.appendChild(img);
-	slots.appendChild(slot);
+	
+	if (i > 0) {
+		let slotCount = document.createElement("div");
+		slotCount.classList.add("count");
+		slotCount.innerHTML = i;
+		slot.appendChild(slotCount);
+	}
 }
 const select = slot => {
 	for (let i = 0 ; i < nbSlots ; i++) {

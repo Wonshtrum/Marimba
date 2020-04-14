@@ -123,7 +123,8 @@ class BatchBase {
 		this.dataIndex = 0;
 	}
 	drawQuad(x, y, w, h, t, f, r, g, b) {
-		y -= 8;
+		x += xOffset;
+		y += yOffset;
 		if (this.quad >= this.maxQuad) {
 			this.flush();
 			this.begin();
@@ -224,7 +225,8 @@ class BatchParticule {
 		this.dataIndex = 0;
 	}
 	drawQuad(x, y, w, h, r, g, b, a) {
-		y -= 8;
+		x += xOffset;
+		y += yOffset;
 		if (this.quad >= this.maxQuad) {
 			this.flush();
 			this.begin();

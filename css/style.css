@@ -1,20 +1,19 @@
+@font-face {
+	font-family: "ClementFiveRegular";
+	src: url("ClementFiveRegular.ttf") format("truetype");
+	font-weight: normal;
+	font-style: normal;
+}
+
 html, body {
 	width: 100%;
 	height: 100%;
 	margin: 0;
 	background-color: black;
+	user-select: none;
 	--scaleX: 0.9;
 }
 
-#main {
-	position: absolute;
-	width: 100%;
-	height: calc(45vw * var(--scaleX));
-	margin: auto;
-	top: 0;
-	bottom: 0;
-	text-align: center;
-}
 .crisp * {
 	image-rendering: -moz-crisp-edges;
 	image-rendering: -webkit-crisp-edges;
@@ -22,9 +21,33 @@ html, body {
 	image-rendering: crisp-edges;
 }
 
-canvas{
+.centered {
+	position: absolute;
+	margin: auto;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+}
+
+#main {
+	width: 100%;
+	height: calc(45vw * var(--scaleX));
+	margin: auto;
+	text-align: center;
+}
+
+#background {
+	position: relative;
+	background-image: url("../img/bg.png");
+	background-size: cover;
 	width: calc(90vw * var(--scaleX));
+	height: 100%;
 	display: inline-block;
+}
+
+#myCan {
+	width: 94%;
 }
 
 #slots {
@@ -36,17 +59,10 @@ canvas{
 	height: calc(9vw * var(--scaleX));
 	width: calc(9vw * var(--scaleX));
 }
-
 .slot img {
-	position: absolute;
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	margin: auto;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
 	transition: width 0.1s, height 0.1s;
 }
 .slot:hover img {
@@ -56,4 +72,15 @@ canvas{
 .slot.selected img {
 	width: 90%;
 	height: 90%;
+}
+.slot .count {
+	position: absolute;
+	bottom: 4%;
+	right: 4%;
+	padding: 3%;
+	color: white;
+	font-size: 2vw;
+	font-family: ClementFiveRegular;
+	background-color: #180c2570;
+	box-shadow: 0 0 20px #180c25;
 }

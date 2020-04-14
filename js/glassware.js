@@ -155,7 +155,7 @@ function astar(x, y, gx, gy, dx, dy, path){
 		for ([dx, dy] of [[-ddy, -ddx], [ddy, ddx], [ddx, ddy]]) {
 			if (x+dx < 0 || y+dy < 0 || x+dx >= col*5 || y+dy >= row*5) continue;
 			dir = dx !== ddx || dy !== ddy ? 1 : 0;
-			cross = Pipe.mat[y+dy][x+dx]*10;
+			cross = Pipe.mat[y+dy][x+dx]*10+(Tile.tileFromPipe(x+dx,y+dy) ? 100 : 0);
 			path = Array.from(p, e => [e[0], e[1]]);
 			if (dir) {
 				path.push([dx, dy]);
@@ -164,7 +164,7 @@ function astar(x, y, gx, gy, dx, dy, path){
 				path.last()[1] += dy;
 			}
 			if (x+dx === gx && y+dy === gy) return path;
-			if (!Tile.tileFromPipe(x+dx,y+dy) && !cache.some(e => e[0] === x+dx && e[1] === y+dy)) {
+			if (!cache.some(e => e[0] === x+dx && e[1] === y+dy)) {
 				pile.push([x+dx, y+dy, g+1+dir*1.8+cross, g+1+dir*1.8+cross+Math.abs(x+dx-gx)+Math.abs(y+dy-gy), dx, dy, path]);
 				cache.push([x+dx, y+dy]);
 			}
