@@ -15,7 +15,7 @@ const validPosition = (x, y, size, inPlace) => {
 		if (!Tile.mat[base][x+i] || !Tile.mat[base][x+i].shelf) return false;
 	}
 	return true;
-}
+};
 
 class Tile {
 	constructor(x, y, size, shelf, immutable) {
@@ -132,7 +132,7 @@ for (let [x, y, s, t] of [[2,0,0,1],[4,0,1,1],[5,0,1,1]])
 	Erlenmeyer.anchors[s][y][x] = t;
 for (let [x, y, s, t] of [[1,0,0,-1],[2,0,0,1],[3,0,0,-1],[3,0,1,-1],[4,0,1,1],[5,0,1,1],[6,0,1,-1]])
 	Bescher.anchors[s][y][x] = t;
-for (let [x, y, s, t] of [[2,0,0,1],[1,1,0,-1],[3,1,0,-1],[1,4,0,-1],[3,4,0,-1]])
+for (let [x, y, s, t] of [[2,0,0,1],[1,1,0,1],[3,1,0,1],[1,4,0,-1],[3,4,0,-1]])
 	Distillation.anchors[s][y][x] = t;
 
 class Shelf extends Tile {
@@ -172,8 +172,7 @@ class Spout extends Tile {
 
 Tile.types = [Erlenmeyer, Bescher, Distillation, Shelf, Spout];
 
-
-function astar(x, y, gx, gy, dx, dy, path){
+const astar = (x, y, gx, gy, dx, dy, path) => {
 	let pile = [[x, y, 0, 0, dx, dy, path]];
 	let cache = [[x, y]];
 	let minI, minX, g, h, ddx, ddy, dir, cross, p;
@@ -206,16 +205,17 @@ function astar(x, y, gx, gy, dx, dy, path){
 		}
 	}
 	return null;
-}
+};
 
 class Pipe {
-	constructor(x, y, path, persistent, full) {
+	constructor(x, y, path, persistent, full, immutable) {
 		if (Pipe.last)
 			Pipe.list.push(this);
 		else
 			Pipe.list[Pipe.list.length-1] = this;
 		Pipe.last = persistent;
 		this.persistent = persistent;
+		this.immutable = immutable;
 		this.path = [];
 		let dx, dy, ddx, ddy;
 		ddx = ddy = 0;
@@ -245,6 +245,16 @@ class Pipe {
 			this.liquid = Array.from({length:this.path.length}, ()=>true);
 		else
 			this.liquid = Array(this.path.length);
+	}
+	contains(x, y) {
+		return this.path.some(e => e[0]/pside === x && e[1]/pside === y);
+	}
+	destroy() {
+		if (this.immutable) return false;
+		for (let [x, y] of this.path)
+			Pipe.mat[y/pside][x/pside]--;
+		Pipe.list.remove(this);
+		return true;
 	}
 	push(n) {
 		if (!this.persistent) return;
@@ -327,50 +337,12 @@ Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
 	} else
 		path.push(tmp);
 	new Pipe(ox, oy, path, persistent, full);
-}
-
-/*let obj = [
-	[0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,1,0,3,0,3,0,0],
-	[0,0,2,0,0,3,0,3,0,0],
-	[2,0,1,0,2,3,0,1,0,0],
-	[0,0,0,0,0,5,0,0,0,0]];
-let big = [
-	[0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0],
-	[1,0,1,0,0,0,0,1,0,0],
-	[0,0,0,0,0,0,0,0,0,0]];
-let shelf = [
-	[0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,1,0,1,0,0],
-	[0,0,0,1,0,1,0,1,0,0],
-	[0,0,1,0,0,1,0,1,0,0],
-	[0,0,0,0,1,1,0,0,0,0]];
-let fill = [
-	[0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,3,0,6,0,0,0,0],
-	[0,0,5,0,0,6,0,0,0,0],
-	[7,0,22,0,2,6,0,0,0,0],
-	[0,0,0,0,0,1,0,0,0,0]];
-let pipes = [
-	[[3,1,2,4],[0,-5],[4,0],[0,15]],
-	[[5,1,2,2],[0,-5],[-4,0],[0,15]],
-	[[2,2,2,5],[0,-6],[-4,0],[0,-1],[1,0],[0,2],[-5,0],[0,1],[3,0],[0,1],[-2,0],[0,1],[1,0],[0,6]]
-];
-
-let R = 0;
-let G = 0.8;
-let B = 0.75;
-for (let i = 0 ; i < 10 ; i++) {
-	for (let j = 0 ; j < 5 ; j++) {
-		if (obj[j][i]) {
-			new Tile.types[obj[j][i]-1](i, j, big[j][i]+1, shelf[j][i] === 1, fill[j][i]);
-		} else if (shelf[j][i])
-			new Shelf(i, j, 1);
+};
+Pipe.searchAndCut = (x, y) => {
+	if (Pipe.mat[y][x] > 0) {
+		for (let pipe of Pipe.list.reverse()) {
+			if (pipe.contains(x, y) && pipe.destroy()) return true;
+		}
 	}
-}
-for (let pipe of pipes) {
-	let [X, Y, x, y] = pipe[0];
-	new Pipe(X*5+x, Y*5+y, pipe.splice(1), true);
-}*/
+	return false;
+};

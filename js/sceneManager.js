@@ -26,7 +26,7 @@ class Scene {
 		}
 		for (let pipe of this.pipeList) {
 			let [X, Y, x, y] = pipe[0];
-			new Pipe(X*5+x, Y*5+y, pipe.slice(1, pipe.length), true);
+			new Pipe(X*5+x, Y*5+y, pipe.slice(1, pipe.length), true, false, true);
 		}
 		for (let slot = 0 ; slot < nbSlots ; slot++) {
 			slots.children[slot].setCount(this.slotList[slot][0]);
@@ -111,4 +111,4 @@ sceneManager.addScene(
 	 "a",
 	 "narrative!"]
 );
-sceneManager.loadScene(0);
+sceneManager.loadScene(1);

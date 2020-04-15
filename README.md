@@ -1,5 +1,5 @@
 # Marimba
-A basic WebGL2 renderer with Multiple Render Targets, Post Processing and Batch Rendering (explored with the Cymbale project).
+A basic WebGL2 engine with Multiple Render Targets, Post Processing, Batch Rendering (explored with the Cymbale project) and Scene Management.
 
 Marimba is not a generic engine but a specific platform to develop an Alchemy Game.
 

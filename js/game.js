@@ -2,7 +2,6 @@ const clamp = (x, a, b) => {
 	return a > x ? a:b < x ? b : x;
 };
 
-
 let canvasOffset;
 const updateCanvasOffset = () => canvasOffset = canvas.getBoundingClientRect();
 const xyOnCanvas = (e) => {
@@ -33,7 +32,7 @@ mouse.checkValid = function() {
 	if (this.selected === 0 && this.save) {
 		Pipe.fromPoints(this.save.px, this.save.py, this.px, this.py, false);
 	} else if (this.selected === 3) {
-		this.isValidPosition = (this.tile && !this.tile.shelf && this.tile.size === this.size && this.tile.x === this.tx && this.tile.y === this.ty) || validPosition(this.tx, this.ty, this.size);
+		this.isValidPosition = (this.tile && !this.tile.shelf && !this.tile.immutable && this.tile.size === this.size && this.tile.x === this.tx && this.tile.y === this.ty) || (validPosition(this.tx, this.ty, this.size) && !(this.tile instanceof Shelf));
 	} else if (this.selected !== 0) {
 		this.isValidPosition = validPosition(this.tx, this.ty, this.size);
 	}
@@ -52,14 +51,14 @@ mouse.calculate = function() {
 	this.checkValid();
 };
 mouse.start = function(e) {
-	if (e.which === 0 && this.selected === 0) {
+	if (e.which === 1 && this.selected === 0) {
 		if (!this.tile || this.tile.anchor(this.px, this.py) !== 1) return;
 		mouse.save = {};
 		Object.assign(mouse.save, mouse);
 	}
 };
 mouse.end = function(e) {
-	if (e.which === 3) {
+	if (e.which === 3 && e.target === canvas) {
 		if (this.tile) {
 			if (this.tile.shelf && !(this.tile instanceof Shelf)) {
 				if (this.tile.destroy()) {
@@ -68,6 +67,8 @@ mouse.end = function(e) {
 			} else {
 				this.tile.propagate(true);
 			}
+		} else {
+			Pipe.searchAndCut(this.px, this.py);
 		}
 		this.update();
 		return;
