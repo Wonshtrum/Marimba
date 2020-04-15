@@ -44,6 +44,11 @@ for (let i = 0 ; i < nbSlots ; i++) {
 		times = times || 1;
 		this.setCount(this.count-times);
 	}
+	slot.get = function(times) {
+		if (this.count < 0) return;
+		times = times || 1;
+		this.setCount(this.count+times);
+	}
 	slot.classList.add("slot");
 	slot.onclick = () => select(i);
 	slots.appendChild(slot);

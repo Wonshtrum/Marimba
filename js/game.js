@@ -61,7 +61,7 @@ mouse.end = function(e) {
 	if (e.which === 3 && e.target === canvas) {
 		if (this.tile) {
 			if (this.tile.shelf && !(this.tile instanceof Shelf)) {
-				if (this.tile.destroy()) {
+				if (this.tile.destroy(true, false)) {
 					new Shelf(this.tile.x, this.tile.y, this.tile.size);
 				}
 			} else {
@@ -91,7 +91,7 @@ mouse.end = function(e) {
 			let shelf = false;
 			if (this.tile instanceof Shelf) {
 				shelf = true;
-				this.tile.destroy();
+				this.tile.destroy(false, false);
 			}
 			new Tile.types[this.selected](this.tx, this.ty, this.size, shelf, 0);
 		}
