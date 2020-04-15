@@ -58,7 +58,7 @@ mouse.start = function() {
 		Object.assign(mouse.save, mouse);
 	}
 };
-mouse.end = function() {
+mouse.end = function(e) {
 	let save = this.save;
 	if (save && save.selected === 0) {
 		this.save = null;
@@ -68,15 +68,18 @@ mouse.end = function() {
 		}
 		if (!this.tile || !this.tile.anchor(this.px, this.py)) return;
 		Pipe.fromPoints(save.px, save.py, this.px, this.py, true);
-	} else if (this.selected === 3 && this.isValidPosition && this.tile) {
-		this.tile.shelf = true;
-	} else if (this.selected !== 0 && this.isValidPosition) {
-		new Tile.types[this.selected](this.tx, this.ty, this.size, false, 0, R, G, B);
 	}
-	if (this.isValidPosition) {
-		this.slot().use(this.size*usesPerSize);
+	if (e.target === canvas) {
+		if (this.selected === 3 && this.isValidPosition && this.tile) {
+			this.tile.shelf = true;
+		} else if (this.selected !== 0 && this.isValidPosition) {
+			new Tile.types[this.selected](this.tx, this.ty, this.size, false, 0, R, G, B);
+		}
+		if (this.isValidPosition) {
+			this.slot().use(this.size*usesPerSize);
+		}
+		this.update();
 	}
-	this.update();
 };
 mouse.wheel = function(e) {
 	let slot = this.slot();
@@ -119,6 +122,6 @@ updateCanvasOffset();
 
 window.onresize = updateCanvasOffset;
 document.onmousemove = (e) => mouse.move(e);
-document.onmousedown = () => mouse.start();
-document.onmouseup = () => mouse.end();
+document.onmousedown = (e) => mouse.start(e);
+document.onmouseup = (e) => mouse.end(e);
 document.onwheel = (e) => mouse.wheel(e);

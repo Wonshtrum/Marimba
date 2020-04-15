@@ -26,6 +26,7 @@ const nbSlots = 5;
 let mouse;
 for (let i = 0 ; i < nbSlots ; i++) {
 	let slot = document.createElement("div");
+	slot.count = 0;
 	slot.setCount = function(count) {
 		this.count = count;
 		if (this.count < 0) {
@@ -57,11 +58,6 @@ for (let i = 0 ; i < nbSlots ; i++) {
 	slot.appendChild(slotCount);
 	slot.slotCount = slotCount;
 
-	if (i > 0) {
-		slot.setCount(i*3);
-	} else {
-		slot.setCount(-1);
-	}
 	slot.big = (i === 1 || i === 3);
 	slot.size = 1;
 }
@@ -88,3 +84,11 @@ gl.clearColor(0, 0, 0, 0);
 //UTILS
 Array.prototype.sum = function() {return this.reduce((a, b) => a+b, 0);}
 Array.prototype.last = function(x) {x = x || 0; return this[this.length-1-x];}
+Array.prototype.remove = function(e) {
+	let index = this.indexOf(e);
+	if (index !== -1) {
+		this.splice(index, 1);
+		return true;
+	}
+	return false;
+}

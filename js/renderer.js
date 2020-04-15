@@ -19,6 +19,9 @@ let bParticule = new BatchParticule(2000, ()=>{
 	fboBase.bind();
 });
 
+let R = 0;
+let G = 0.8;
+let B = 0.75;
 let dR = 0.01;
 let dG = 0.025;
 let dB = 0.03;

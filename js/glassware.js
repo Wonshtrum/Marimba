@@ -1,5 +1,7 @@
 const validPosition = (x, y, size, inPlace) => {
 	if (!inPlace) {
+		let target = Tile.mat[y][x];
+		if (target && target instanceof Shelf && target.x === x && target.y === y && target.size === size) return true;
 		for (let i = 0 ; i < size ; i++) {
 			for (let j = 0 ; j < size ; j++) {
 				if (Tile.mat[y+j][x+i]) return false;
@@ -15,11 +17,12 @@ const validPosition = (x, y, size, inPlace) => {
 }
 
 class Tile {
-	constructor(x, y, size, shelf) {
+	constructor(x, y, size, shelf, immutable) {
 		this.x = x;
 		this.y = y;
 		this.size = size;
 		this.shelf = shelf;
+		this.immutable = immutable;
 		Tile.list.push(this);
 		for (let i = 0 ; i < size ; i++)
 			for (let j = 0 ; j < size ; j++)
@@ -30,6 +33,25 @@ class Tile {
 	}
 	validPosition() {
 		return validPosition(this.x, this.y, this.size, true);
+	}
+	destroy() {
+		if (this.immutable) return false;
+		for (let i = 0 ; i < this.size ; i++) {
+			for (let j = 0 ; j < this.size ; j++) {
+				Tile.mat[this.y+j][this.x+i] = undefined;
+			}
+		}
+		Tile.list.remove(this);
+		return true;
+	}
+	propagate(force) {
+		console.log(this.x,this.y);
+		if ((force || !this.validPosition()) && this.destroy()) {
+			for (let i = 0 ; i < this.size ; i++) {
+				if (Tile.mat[this.y-1][this.x+i])
+					Tile.mat[this.y-1][this.x+i].propagate();
+			}
+		}
 	}
 	draw(ctx) {
 		if (this.shelf)
@@ -47,14 +69,11 @@ Tile.mat = Array.from({length: row}, () => Array(col));
 Tile.tileFromPipe = (x, y) => Tile.mat[Math.floor(y/5)][Math.floor(x/5)];
 
 class Flask extends Tile {
-	constructor(x, y, size, shelf, level, R, G, B) {
-		super(x, y, size, shelf);
+	constructor(x, y, size, shelf, level, immutable) {
+		super(x, y, size, shelf, immutable);
 		this.level = 0;
 		this.fill = 0;
 		this.setLevel(level);
-		this.R = R;
-		this.G = G;
-		this.B = B;
 	}
 	anchor(type, x, y) {
 		return type.anchors[this.size-1][y-5*this.y][x-5*this.x];
@@ -114,14 +133,14 @@ for (let [x, y, s, t] of [[2,0,0,1],[1,1,0,-1],[3,1,0,-1],[1,4,0,-1],[3,4,0,-1]]
 	Distillation.anchors[s][y][x] = t;
 
 class Shelf extends Tile {
-	constructor(x, y, size) {
-		super(x, y, size, true);
+	constructor(x, y, size, _1, _2, immutable) {
+		super(x, y, size, true, immutable);
 	}
 };
 
 class Spout extends Tile {
-	constructor(x, y, size, shelf, lit) {
-		super(x, y, size, shelf);
+	constructor(x, y, size, shelf, lit, immutable) {
+		super(x, y, size, shelf, immutable);
 		this.level = 0;
 		this.fill = 0;
 		this.lit(lit);
@@ -307,7 +326,7 @@ Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
 	new Pipe(ox, oy, path, persistent, full);
 }
 
-let obj = [
+/*let obj = [
 	[0,0,0,0,0,0,0,0,0,0],
 	[0,0,0,1,0,3,0,3,0,0],
 	[0,0,2,0,0,3,0,3,0,0],
@@ -343,7 +362,7 @@ let B = 0.75;
 for (let i = 0 ; i < 10 ; i++) {
 	for (let j = 0 ; j < 5 ; j++) {
 		if (obj[j][i]) {
-			new Tile.types[obj[j][i]-1](i, j, big[j][i]+1, shelf[j][i] === 1, fill[j][i], R, G, B);
+			new Tile.types[obj[j][i]-1](i, j, big[j][i]+1, shelf[j][i] === 1, fill[j][i]);
 		} else if (shelf[j][i])
 			new Shelf(i, j, 1);
 	}
@@ -351,4 +370,4 @@ for (let i = 0 ; i < 10 ; i++) {
 for (let pipe of pipes) {
 	let [X, Y, x, y] = pipe[0];
 	new Pipe(X*5+x, Y*5+y, pipe.splice(1), true);
-}
+}*/
