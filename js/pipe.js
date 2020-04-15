@@ -43,6 +43,8 @@ class Pipe {
 		this.persistent = persistent;
 		this.immutable = immutable;
 		this.path = [];
+		this.input = null;
+		this.output = null;
 		let dx, dy, ddx, ddy;
 		ddx = ddy = 0;
 		for (let i = 0 ; i < path.length ; i++) {
@@ -72,6 +74,12 @@ class Pipe {
 		else
 			this.liquid = Array(this.path.length);
 	}
+	connect(input, output) {
+		this.input = input;
+		this.output = output;
+		input.plugOut(this);
+		output.plugIn(this);
+	}
 	contains(x, y) {
 		return this.path.some(e => e[0]/pside === x && e[1]/pside === y);
 	}
@@ -80,6 +88,8 @@ class Pipe {
 		for (let [x, y] of this.path)
 			Pipe.mat[y/pside][x/pside]--;
 		Pipe.list.remove(this);
+		if (this.input) this.input.pipeOut.remove(this);
+		if (this.output) this.output.pipeIn.remove(this);
 		return true;
 	}
 	push(n) {
@@ -107,6 +117,7 @@ class Pipe {
 Pipe.last = true;
 Pipe.list = [];
 Pipe.mat = Array.from({length:row*5}, () => Array(col*5).fill(0));
+
 Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
 	if (x0 === x1 && y0 === y1) return;
 	let pad = 1;
@@ -162,8 +173,9 @@ Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
 		path.last()[1] += tmp[1];
 	} else
 		path.push(tmp);
-	new Pipe(ox, oy, path, persistent, full);
+	return new Pipe(ox, oy, path, persistent, full);
 };
+
 Pipe.searchAndCut = (x, y) => {
 	if (Pipe.mat[y][x] > 0) {
 		for (let pipe of Pipe.list.reverse()) {

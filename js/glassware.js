@@ -24,13 +24,11 @@ class Tile {
 		this.size = size;
 		this.shelf = shelf;
 		this.immutable = immutable;
+		this.class = Tile.nameToClass[this.constructor.name];
 		Tile.list.push(this);
 		for (let i = 0 ; i < size ; i++)
 			for (let j = 0 ; j < size ; j++)
 				Tile.mat[y+j][x+i] = this;
-	}
-	getId() {
-		return Tile.nameToId[this.constructor.name];
 	}
 	anchor() {
 		return false;
@@ -49,7 +47,7 @@ class Tile {
 		}
 		Tile.list.remove(this);
 		if (drop && !(this instanceof Shelf)) {
-			slots.children[this.getId()].get(this.size*usesPerSize);
+			slots.children[this.class.id].get(this.size*usesPerSize);
 		}
 		if (dropShelf && this.shelf) {
 			slots.children[3].get(this.size*usesPerSize);
@@ -88,9 +86,25 @@ class Flask extends Tile {
 		this.level = 0;
 		this.fill = 0;
 		this.setLevel(level);
+		this.pipeIn = [];
+		this.pipeOut = [];
 	}
-	anchor(type, x, y) {
-		return type.anchors[this.size-1][y-5*this.y][x-5*this.x];
+	plugIn(pipe) {
+		this.pipeIn.push(pipe);
+	}
+	plugOut(pipe) {
+		this.pipeOut.push(pipe);
+	}
+	destroy(drop, dropShelf) {
+		if (super.destroy(drop, dropShelf)) {
+			for (let pipe of this.pipeIn.copy()) pipe.destroy();
+			for (let pipe of this.pipeOut.copy()) pipe.destroy();
+			return true;
+		}
+		return false;
+	}
+	anchor(x, y) {
+		return this.class.anchors[this.size-1][y-5*this.y][x-5*this.x];
 	}
 	setLevel(level) {
 		this.level = level
@@ -99,29 +113,22 @@ class Flask extends Tile {
 };
 
 class Erlenmeyer extends Flask {
-	anchor(x, y) {
-		return super.anchor(Erlenmeyer, x, y);
-	}
 	draw(ctx) {
 		super.draw(ctx);
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 0, this.fill, R, G, B);
 	}
 };
+Erlenmeyer.id = 0;
 
 class Bescher extends Flask {
-	anchor(x, y) {
-		return super.anchor(Bescher, x, y);
-	}
 	draw(ctx) {
 		super.draw(ctx);
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 1, this.fill, R, G, B);
 	}
 };
+Bescher.id = 1;
 
 class Distillation extends Flask {
-	anchor(x, y) {
-		return super.anchor(Distillation, x, y);
-	}
 	setLevel(level) {
 		this.level = level
 		if (level > 3) level += 2
@@ -132,6 +139,7 @@ class Distillation extends Flask {
 		super.draw(ctx);
 	}
 };
+Distillation.id = 2;
 
 //ANCHORS FOR FLASKS
 for (let flask of [Erlenmeyer, Bescher, Distillation]) {
@@ -151,6 +159,7 @@ class Shelf extends Tile {
 		super(x, y, size, true, immutable);
 	}
 };
+Shelf.id = 3;
 
 class Spout extends Tile {
 	constructor(x, y, size, shelf, lit, immutable) {
@@ -180,6 +189,7 @@ class Spout extends Tile {
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 4, this.fill, 0, 0, 0);
 	}
 };
+Spout.id = 4;
 
 Tile.types = [Erlenmeyer, Bescher, Distillation, Shelf, Spout];
-Tile.nameToId = {"Erlenmeyer": 0, "Bescher": 1, "Distillation": 2, "Shelf": 3, "Spout": 4};
+Tile.nameToClass = {"Erlenmeyer": Erlenmeyer, "Bescher": Bescher, "Distillation": Distillation, "Shelf": Shelf, "Spout": Spout};

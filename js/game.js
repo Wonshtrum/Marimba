@@ -82,7 +82,8 @@ mouse.end = function(e) {
 			Pipe.list.pop();
 		}
 		if (!this.tile || this.tile.anchor(this.px, this.py) !== -1) return;
-		Pipe.fromPoints(save.px, save.py, this.px, this.py, true);
+		let pipe = Pipe.fromPoints(save.px, save.py, this.px, this.py, true);
+		pipe.connect(save.tile, this.tile);
 	}
 	if (e.target === canvas) {
 		if (this.selected === 3 && this.isValidPosition && this.tile) {
