@@ -1,4 +1,4 @@
-const matToList = (obj, size, shelf, fill) => {
+const matToList = (row, col, obj, size, shelf, fill) => {
 	list = [];
 	for (let i = 0 ; i < col ; i++) {
 		for (let j = 0 ; j < row ; j++) {
@@ -12,8 +12,10 @@ const matToList = (obj, size, shelf, fill) => {
 }
 
 class Scene {
-	constructor(name, objList, pipeList, slotList, narrative) {
+	constructor(name, row, col, objList, pipeList, slotList, narrative) {
 		this.name = name;
+		this.row = row;
+		this.col = col;
 		this.objList = objList;
 		this.pipeList = pipeList;
 		this.slotList = slotList;
@@ -21,6 +23,15 @@ class Scene {
 	}
 	load() {
 		console.log("Loading scene", this.name);
+		setDimensions(this.row, this.col);
+		updateShaders();
+		updateFbos();
+		Tile.list = [];
+		Tile.mat = Array.from({length: row}, () => Array(col));
+		Pipe.last = true;
+		Pipe.list = [];
+		Pipe.mat = Array.from({length:row*5}, () => Array(col*5).fill(0));
+
 		for (let [type, x, y, size, shelf, fill] of this.objList) {
 			new Tile.types[type](x, y, size, shelf, fill, true);
 		}
@@ -40,22 +51,20 @@ class SceneManager {
 		this.scenes = scenes;
 		this.currentScene = 0;
 		this.currentNarrative = -1;
+		this.loop;
 	}
-	addScene(name, objList, pipeList, slotList, narrative) {
-		this.scenes.push(new Scene(name, objList, pipeList, slotList, narrative));
+	addScene(name, row, col, objList, pipeList, slotList, narrative) {
+		this.scenes.push(new Scene(name, row, col, objList, pipeList, slotList, narrative));
 	}
-	unload() {
-		Tile.list = [];
-		Tile.mat = Array.from({length: row}, () => Array(col));
-		Pipe.last = true;
-		Pipe.list = [];
-		Pipe.mat = Array.from({length:row*5}, () => Array(col*5).fill(0));
+	clear() {
+		clearInterval(this.loop);
 	}
 	loadScene(index) {
-		this.unload();
+		this.clear();
 		this.currentScene = index;
 		this.currentNarrative = -1;
 		this.scenes[index].load();
+		this.loop = setInterval(render, 35);
 	}
 	reload() {this.loadScene(this.currentScene);}
 	nextScene() {this.loadScene(this.currentScene+1);}
@@ -69,6 +78,7 @@ sceneManager = new SceneManager([]);
 
 sceneManager.addScene(
 	"SCENE_0",
+	3, 6,
 	[],
 	[],
 	[[-1, true], [-1, true], [-1, true], [-1, true], [-1, true]],
@@ -77,7 +87,9 @@ sceneManager.addScene(
 sceneManager.addScene(
 	"SCENE_1",
 
-	matToList(
+	5, 10,
+
+	matToList(5, 10,
 	[[0,0,0,0,0,0,0,0,0,0],
 	 [0,0,0,1,0,3,0,3,0,0],
 	 [0,0,2,0,0,3,0,3,0,0],
@@ -111,4 +123,3 @@ sceneManager.addScene(
 	 "a",
 	 "narrative!"]
 );
-sceneManager.loadScene(1);

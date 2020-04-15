@@ -279,13 +279,23 @@ class FrameBuffer {
 		this.height = height;
 		this.tex = Array(n);
 		this.fbo = gl.createFramebuffer();
-		this.attachments = Array.from({length:n}, (_,i)=>gl.COLOR_ATTACHMENT0+i);
+		this.attachments = Array.from({length:n}, (_, i)=>gl.COLOR_ATTACHMENT0+i);
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
 		for (let i = 0 ; i < n ; i++) {
 			gl.activeTexture(gl.TEXTURE0+i+this.tex0);
 			this.tex[i] = defaultTex();
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
 			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.attachments[i], gl.TEXTURE_2D, this.tex[i], 0);
+		}
+	}
+	resize(width, height) {
+		this.width = width;
+		this.height = height;
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
+		for (let i = 0 ; i < this.n ; i++) {
+			gl.activeTexture(gl.TEXTURE0+i+this.tex0);
+			gl.bindTexture(gl.TEXTURE_2D, this.tex[i]);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
 		}
 	}
 	bind() {

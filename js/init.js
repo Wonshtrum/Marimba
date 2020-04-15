@@ -8,15 +8,19 @@ const side = 55;
 const pside = side/5;
 const xOffset = 0;
 const yOffset = 0;
-let row = 5;
-let col = 10;
-let rowH = row/2;
-let colH = col/2;
+let row, col, rowH, colH, width, height;
+const setDimensions = (newRow, newCol) => {
+	console.log(newRow, newCol);
+	row = newRow;
+	col = newCol;
+	rowH = row/2;
+	colH = col/2;
+	width = col*side;
+	height = row*side;
+	canvas.width = width;
+	canvas.height = height;
+}
 
-let width = col*side;
-let height = row*side;
-
-const canvasScale = 1;
 const full = 0.999;
 const bigShelf = true;
 const usesPerSize = 1;
@@ -78,8 +82,8 @@ const select = slot => {
 }
 
 //CANVAS AND WEBGL
-canvas.width = width*canvasScale;
-canvas.height = height*canvasScale;
+//canvas.width = width;
+//canvas.height = height;
 const gl = canvas.getContext('webgl2', {preserveDrawingBuffer: true, premultipliedAlpha: false});
 gl.enable(gl.BLEND);
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);

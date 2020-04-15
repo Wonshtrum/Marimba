@@ -4,10 +4,17 @@ let va1 = new VertexArray([
 	2, 2, 1, 0,
 	0, 2, 0, 0], [2, 2], gl.STATIC_DRAW);
 
+width = 0;
+height = 0;
 //       0   1        2     3       4
 //tex = [BG, SPRITES, main, bright, tmpBlur]
-let fboBase = new FrameBuffer(width, height, 2, 2);
-let fboBlur = [new FrameBuffer(canvas.width, canvas.height, 1, 4), new FrameBuffer(canvas.width, canvas.height, 1, 3)];
+fboBase = new FrameBuffer(width, height, 2, 2);
+fboBlur = [new FrameBuffer(canvas.width, canvas.height, 1, 4), new FrameBuffer(canvas.width, canvas.height, 1, 3)];
+const updateFbos = () => {
+	fboBase.resize(width, height);
+	fboBlur[0].resize(width, height);
+	fboBlur[1].resize(width, height);
+}
 
 let bBase = new BatchBase(2000, ()=>{
 	shaderBright.bind();
@@ -76,14 +83,12 @@ const render = () => {
 	va1.draw();
 }
 
-let loop;
 const start = () => {
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, textures["sprites"]);
 	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, textures["bg"]);
-
-	loop = setInterval(render, 35);
+	sceneManager.loadScene(1);
 }
 
 setTimeout(start, 100);

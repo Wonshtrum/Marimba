@@ -214,7 +214,6 @@ gl.uniform1iv(shaderTex.uniforms.u_tex, [1, 2, 3]);
 
 shaderBright.bind();
 gl.uniform1i(shaderBright.uniforms.u_tex, 0);
-gl.uniform2f(shaderBright.uniforms.u_screen, width/2, height/2);
 
 shaderBlurH.bind();
 gl.uniform2f(shaderBlurH.uniforms.u_screen, 1, 1);
@@ -223,5 +222,9 @@ shaderBlurV.bind();
 gl.uniform2f(shaderBlurV.uniforms.u_screen, 1, 1);
 gl.uniform1i(shaderBlurV.uniforms.u_tex, 4);
 
-shaderParticule.bind();
-gl.uniform2f(shaderParticule.uniforms.u_screen, width/2, height/2);
+const updateShaders = () => {
+	shaderBright.bind();
+	gl.uniform2f(shaderBright.uniforms.u_screen, width/2, height/2);
+	shaderParticule.bind();
+	gl.uniform2f(shaderParticule.uniforms.u_screen, width/2, height/2);
+}
