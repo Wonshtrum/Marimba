@@ -1,6 +1,7 @@
 const validPosition = (x, y, size, inPlace) => {
 	if (!inPlace) {
 		let target = Tile.mat[y][x];
+		if (target && target.immutable) return false;
 		if (target && target instanceof Shelf && target.x === x && target.y === y && target.size === size) return true;
 		for (let i = 0 ; i < size ; i++) {
 			for (let j = 0 ; j < size ; j++) {
@@ -45,13 +46,15 @@ class Tile {
 		return true;
 	}
 	propagate(force) {
-		console.log(this.x,this.y);
 		if ((force || !this.validPosition()) && this.destroy()) {
 			for (let i = 0 ; i < this.size ; i++) {
-				if (Tile.mat[this.y-1][this.x+i])
-					Tile.mat[this.y-1][this.x+i].propagate();
+				if (this.y > 0 && Tile.mat[this.y-1][this.x+i])
+					Tile.mat[this.y-1][this.x+i].schedule();
 			}
 		}
+	}
+	schedule() {
+		setTimeout(() => this.propagate(), 100);
 	}
 	draw(ctx) {
 		if (this.shelf)
@@ -280,7 +283,7 @@ Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
 	let path = [];
 	let tmp = [0, 0];
 
-	let full = mouse.tile && mouse.tile.anchor(mouse.px, mouse.py);
+	let full = mouse.tile && mouse.tile.anchor(mouse.px, mouse.py) === -1;
 	if (py0 == 0) {
 		oy += pad;
 		y0 -= 1;

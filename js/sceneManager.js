@@ -29,7 +29,8 @@ class Scene {
 			new Pipe(X*5+x, Y*5+y, pipe.slice(1, pipe.length), true);
 		}
 		for (let slot = 0 ; slot < nbSlots ; slot++) {
-			slots.children[slot].setCount(this.slotList[slot]);
+			slots.children[slot].setCount(this.slotList[slot][0]);
+			slots.children[slot].big = this.slotList[slot][1];
 		}
 	}
 }
@@ -52,15 +53,14 @@ class SceneManager {
 	}
 	loadScene(index) {
 		this.unload();
-		index = index || this.currentScene;
 		this.currentScene = index;
 		this.currentNarrative = -1;
 		this.scenes[index].load();
 	}
-	reload() {this.loadScene();}
+	reload() {this.loadScene(this.currentScene);}
 	nextScene() {this.loadScene(this.currentScene+1);}
 	nextNarrative() {
-		console.log(this.scenes[this.currentScene].narrative[this.currentNarrative++]);
+		console.log(this.scenes[this.currentScene].narrative[++this.currentNarrative]);
 	}
 }
 
@@ -69,6 +69,13 @@ sceneManager = new SceneManager([]);
 
 sceneManager.addScene(
 	"SCENE_0",
+	[],
+	[],
+	[[-1, true], [-1, true], [-1, true], [-1, true], [-1, true]],
+	[]
+);
+sceneManager.addScene(
+	"SCENE_1",
 
 	matToList(
 	[[0,0,0,0,0,0,0,0,0,0],
@@ -96,7 +103,7 @@ sceneManager.addScene(
 	 [[5,1,2,2],[0,-5],[-4,0],[0,15]],
 	 [[2,2,2,5],[0,-6],[-4,0],[0,-1],[1,0],[0,2],[-5,0],[0,1],[3,0],[0,1],[-2,0],[0,1],[1,0],[0,6]]],
 
-	[-1, 3, 2, 9, 0],
+	[[-1, false], [3, true], [2, false], [9, true], [4, false]],
 
 	["Hello",
 	 "This",

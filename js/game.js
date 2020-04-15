@@ -21,7 +21,7 @@ mouse.slot = function() {
 }
 mouse.update = function() {
 	let slot = this.slot();
-	if (slot.size === 2 && slot.count < 2*usesPerSize) {
+	if (slot.size === 2 && slot.count < 2*usesPerSize && slot.count > -1) {
 		slot.size = 1;
 	} if (slot.count === 0) {
 		select(0);
@@ -51,14 +51,28 @@ mouse.calculate = function() {
 	this.tile = Tile.mat[this.ty][this.tx];
 	this.checkValid();
 };
-mouse.start = function() {
-	if (this.selected === 0) {
+mouse.start = function(e) {
+	if (e.which === 0 && this.selected === 0) {
 		if (!this.tile || this.tile.anchor(this.px, this.py) !== 1) return;
 		mouse.save = {};
 		Object.assign(mouse.save, mouse);
 	}
 };
 mouse.end = function(e) {
+	if (e.which === 3) {
+		if (this.tile) {
+			if (this.tile.shelf && !(this.tile instanceof Shelf)) {
+				if (this.tile.destroy()) {
+					new Shelf(this.tile.x, this.tile.y, this.tile.size);
+				}
+			} else {
+				this.tile.propagate(true);
+			}
+		}
+		this.update();
+		return;
+	}
+	if (e.which !== 1) return;
 	let save = this.save;
 	if (save && save.selected === 0) {
 		this.save = null;
@@ -66,14 +80,19 @@ mouse.end = function(e) {
 			Pipe.last = true;
 			Pipe.list.pop();
 		}
-		if (!this.tile || !this.tile.anchor(this.px, this.py)) return;
+		if (!this.tile || this.tile.anchor(this.px, this.py) !== -1) return;
 		Pipe.fromPoints(save.px, save.py, this.px, this.py, true);
 	}
 	if (e.target === canvas) {
 		if (this.selected === 3 && this.isValidPosition && this.tile) {
 			this.tile.shelf = true;
 		} else if (this.selected !== 0 && this.isValidPosition) {
-			new Tile.types[this.selected](this.tx, this.ty, this.size, false, 0, R, G, B);
+			let shelf = false;
+			if (this.tile instanceof Shelf) {
+				shelf = true;
+				this.tile.destroy();
+			}
+			new Tile.types[this.selected](this.tx, this.ty, this.size, shelf, 0);
 		}
 		if (this.isValidPosition) {
 			this.slot().use(this.size*usesPerSize);
@@ -84,7 +103,7 @@ mouse.end = function(e) {
 mouse.wheel = function(e) {
 	let slot = this.slot();
 	if (!slot.big) return;
-	if (e.deltaY > 0) {
+	if (e.deltaY < 0) {
 		slot.size = 2;
 	} else {
 		slot.size = 1;
@@ -121,7 +140,8 @@ select(0);
 updateCanvasOffset();
 
 window.onresize = updateCanvasOffset;
-document.onmousemove = (e) => mouse.move(e);
-document.onmousedown = (e) => mouse.start(e);
-document.onmouseup = (e) => mouse.end(e);
-document.onwheel = (e) => mouse.wheel(e);
+document.onmousemove = e => mouse.move(e);
+document.onmousedown = e => mouse.start(e);
+document.onmouseup = e => mouse.end(e);
+document.onwheel = e => mouse.wheel(e);
+document.oncontextmenu = e => e.preventDefault()

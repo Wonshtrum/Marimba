@@ -27,6 +27,8 @@ let mouse;
 for (let i = 0 ; i < nbSlots ; i++) {
 	let slot = document.createElement("div");
 	slot.count = 0;
+	slot.size = 1;
+	slot.big = false;
 	slot.setCount = function(count) {
 		this.count = count;
 		if (this.count < 0) {
@@ -57,9 +59,6 @@ for (let i = 0 ; i < nbSlots ; i++) {
 	slotCount.classList.add("count");
 	slot.appendChild(slotCount);
 	slot.slotCount = slotCount;
-
-	slot.big = (i === 1 || i === 3);
-	slot.size = 1;
 }
 const select = slot => {
 	for (let i = 0 ; i < nbSlots ; i++) {
