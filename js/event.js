@@ -3,7 +3,10 @@ const clamp = (x, a, b) => {
 };
 
 let canvasOffset;
-const updateCanvasOffset = () => canvasOffset = canvas.getBoundingClientRect();
+const resize = () => {
+	canvasOffset = canvas.getBoundingClientRect();
+	//narrative.style.lineHeight = canvas.offsetHeight;
+}
 const xyOnCanvas = (e) => {
 	let x = Math.floor(width*(e.x-canvasOffset.x)/canvas.offsetWidth);
 	let y = Math.floor(height*(e.y-canvasOffset.y)/canvas.offsetHeight);
@@ -138,12 +141,21 @@ mouse.draw = function(ctx) {
 	}
 };
 
-select(0);
-updateCanvasOffset();
+const keyDispatcher = e => {
+	if (e.key === "ArrowRight") {
+		sceneManager.nextNarrative();
+	} else if (e.key === "ArrowLeft") {
+		sceneManager.previousNarrative();
+	}
+}
 
-window.onresize = updateCanvasOffset;
+select(0);
+resize();
+
+window.onresize = resize();
 document.onmousemove = e => mouse.move(e);
 document.onmousedown = e => mouse.start(e);
 document.onmouseup = e => mouse.end(e);
 document.onwheel = e => mouse.wheel(e);
-document.oncontextmenu = e => e.preventDefault()
+document.oncontextmenu = e => e.preventDefault();
+document.onkeydown = e => keyDispatcher(e);

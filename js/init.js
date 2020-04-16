@@ -1,13 +1,17 @@
-//MAIN VARIABLES
-const main = document.getElementById("main");
-const canvas = document.getElementById('myCan');
-const slots = document.getElementById("slots");
-const background = document.getElementById("background");
-
+//GLOBAL VARIABLES
+//constants
 const side = 55;
 const pside = side/5;
 const xOffset = 0;
 const yOffset = 0;
+const full = 0.999;
+const bigShelf = true;
+const usesPerSize = 1;
+const nbSlots = 5;
+const none = "";
+const second = 1000;
+
+//global variables used for scale
 let row, col, rowH, colH, width, height;
 const setDimensions = (newRow, newCol) => {
 	console.log(newRow, newCol);
@@ -21,12 +25,14 @@ const setDimensions = (newRow, newCol) => {
 	canvas.height = height;
 }
 
-const full = 0.999;
-const bigShelf = true;
-const usesPerSize = 1;
-const nbSlots = 5;
-
 //DOM
+const main = document.getElementById("main");
+const canvas = document.getElementById('myCan');
+const slots = document.getElementById("slots");
+const background = document.getElementById("background");
+const narrative = document.getElementById("narrative");
+
+//create the inventory slots and link them to the mouse
 let mouse;
 for (let i = 0 ; i < nbSlots ; i++) {
 	let slot = document.createElement("div");
@@ -101,3 +107,4 @@ Array.prototype.remove = function(e) {
 	}
 	return false;
 }
+const getOrElse = (value, orElse) => value === undefined ? orElse : value;

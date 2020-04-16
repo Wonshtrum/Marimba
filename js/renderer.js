@@ -91,4 +91,5 @@ const start = () => {
 	sceneManager.loadScene(1);
 }
 
+//WAIT FOR TEXTURES TO BE LOADED
 setTimeout(start, 100);

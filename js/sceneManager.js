@@ -49,8 +49,9 @@ class Scene {
 class SceneManager {
 	constructor(scenes) {
 		this.scenes = scenes;
-		this.currentScene = 0;
-		this.currentNarrative = -1;
+		this.currentScene = -1;
+		this.currentNarrative = 0;
+		this.maxNarrative = 0;
 		this.loop;
 	}
 	addScene(name, row, col, objList, pipeList, slotList, narrative) {
@@ -63,13 +64,44 @@ class SceneManager {
 		this.clear();
 		this.currentScene = index;
 		this.currentNarrative = -1;
+		this.maxNarrative = this.scenes[index].narrative.length-1;
 		this.scenes[index].load();
 		this.loop = setInterval(render, 35);
+		this.nextNarrative();
 	}
 	reload() {this.loadScene(this.currentScene);}
 	nextScene() {this.loadScene(this.currentScene+1);}
 	nextNarrative() {
-		console.log(this.scenes[this.currentScene].narrative[++this.currentNarrative]);
+		if (this.currentNarrative < this.maxNarrative) {
+			this.displayText(...this.scenes[this.currentScene].narrative[++this.currentNarrative]);
+			return true;
+		}
+		return false;
+	}
+	previousNarrative() {
+		if (this.currentNarrative > 0) {
+			this.displayText(...this.scenes[this.currentScene].narrative[--this.currentNarrative]);
+			return true;
+		}
+		return false;
+	}
+	displayText(text, top, bottom, right, left, width, height) {
+		narrative.classList.remove("show");
+		if (!text) return;
+		top = getOrElse(top, none);
+		bottom = getOrElse(bottom, none);
+		right = getOrElse(right, none);
+		left = getOrElse(left, none);
+		width = getOrElse(width, "94%");
+		height = getOrElse(height, "88%");
+		narrative.style.top = top;
+		narrative.style.bottom = bottom;
+		narrative.style.right = right;
+		narrative.style.left = left;
+		narrative.style.width = width;
+		narrative.style.height = height;
+		narrative.innerHTML = text;
+		narrative.classList.add("show");
 	}
 }
 
@@ -117,9 +149,10 @@ sceneManager.addScene(
 
 	[[-1, false], [3, true], [2, false], [9, true], [4, false]],
 
-	["Hello",
-	 "This",
-	 "is",
-	 "a",
-	 "narrative!"]
+	[["Hello\nici", 0, none, none, 0, none, none],
+	 ["This", 0, none, 0, none, none, none],
+	 ["is", none, 0, 0, none, none, none],
+	 ["a", none, 0, none, 0, none, none],
+	 ["narrative!", 0, 0, 0, 0, none, none],
+	 ["", 0, 0, 0, 0, 0, 0]]
 );
