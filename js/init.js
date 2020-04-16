@@ -6,6 +6,7 @@ const xOffset = 0;
 const yOffset = 0;
 const full = 0.999;
 const bigShelf = true;
+const particulesPerSize = 10;
 const usesPerSize = 1;
 const nbSlots = 5;
 const none = "";
@@ -108,3 +109,4 @@ Array.prototype.remove = function(e) {
 	return false;
 }
 const getOrElse = (value, orElse) => value === undefined ? orElse : value;
+const rnd = Math.random;

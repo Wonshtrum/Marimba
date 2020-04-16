@@ -17,6 +17,24 @@ const validPosition = (x, y, size, inPlace) => {
 	return true;
 };
 
+
+const range = (x, r) => x+rnd()*r;
+const breakParticules = (x, y, size, side, scale) => {
+	scale = getOrElse(scale, 1);
+	for (let i = 0 ; i < 3 ; i++) {
+		setTimeout(() => {
+			for (let j = 0 ; j < particulesPerSize*size*scale ; j++) {
+				new Particule(
+					range(x, size)*side, range(y, size)*side,
+					1, 1, 1, 1, 1,
+					5*size, 0, 1, 1, 0,
+					20
+				);
+			}
+		}, 100*i);
+	}
+};
+
 class Tile {
 	constructor(x, y, size, shelf, immutable) {
 		this.x = x;
@@ -37,8 +55,8 @@ class Tile {
 		return validPosition(this.x, this.y, this.size, true);
 	}
 	destroy(drop, dropShelf) {
-		drop = drop || drop === undefined;
-		dropShelf = dropShelf || dropShelf === undefined;
+		drop = getOrElse(drop, true);
+		dropShelf = getOrElse(dropShelf, true);
 		if (this.immutable) return false;
 		for (let i = 0 ; i < this.size ; i++) {
 			for (let j = 0 ; j < this.size ; j++) {
@@ -46,11 +64,17 @@ class Tile {
 			}
 		}
 		Tile.list.remove(this);
+		let hasDrop = false;
 		if (drop && !(this instanceof Shelf)) {
 			slots.children[this.class.id].get(this.size*usesPerSize);
+			hasDrop = true;
 		}
 		if (dropShelf && this.shelf) {
 			slots.children[3].get(this.size*usesPerSize);
+			hasDrop = true;
+		}
+		if (hasDrop) {
+			breakParticules(this.x, this.y, this.size, side);
 		}
 		return true;
 	}

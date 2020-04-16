@@ -316,25 +316,39 @@ class FrameBuffer {
 const unbindAllFbo = FrameBuffer.prototype.unbind;
 
 class Particule {
-	constructor(x, y, s, r, g, b, a) {
+	constructor(x, y, s1, r1, g1, b1, a1, s2, r2, g2, b2, a2, life, ax, ay) {
 		this.x = x;
 		this.y = y;
-		this.s = s;
-		this.r = r;
-		this.g = g;
-		this.b = b;
-		this.a = a;
-		this.ax = rnd()*0.02-0.01;
-		this.ay = rnd()*0.02-0.01;
+		this.s = s1;
+		this.r = r1;
+		this.g = g1;
+		this.b = b1;
+		this.a = a1;
+		this.life = life;
+		this.ds = (s2-s1)/(2*life);
+		this.dr = (r2-r1)/life;
+		this.dg = (g2-g1)/life;
+		this.db = (b2-b1)/life;
+		this.da = (a2-a1)/life;
+		this.ax = getOrElse(ax, rnd()*0.2-0.1);
+		this.ay = getOrElse(ay, rnd()*0.2-0.1);
 		this.vx = 0;
 		this.vy = 0;
 		Particule.list.push(this);
 	}
 	update() {
+		this.s += 2*this.ds;
+		this.r += this.dr;
+		this.g += this.dg;
+		this.b += this.db;
+		this.a += this.da;
 		this.vx += this.ax;
 		this.vy += this.ay;
-		this.x += this.vx;
-		this.y += this.vy;
+		this.x += this.vx-this.ds;
+		this.y += this.vy-this.ds;
+		if (this.life-- === 0) {
+			Particule.list.remove(this);
+		}
 	}
 	draw(ctx) {
 		ctx.drawQuad(this.x, this.y, this.s, this.s, this.r, this.g, this.b, this.a);

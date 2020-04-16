@@ -202,7 +202,7 @@ const shaderParticule = new Shader(
 
 	void main() {
 		baseColor = v_color;
-		brightColor = vec4(v_color.rgb, 1);
+		brightColor = v_color;
 	}`
 );
 

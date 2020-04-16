@@ -85,8 +85,10 @@ class Pipe {
 	}
 	destroy() {
 		if (this.immutable) return false;
-		for (let [x, y] of this.path)
+		for (let [x, y] of this.path) {
 			Pipe.mat[y/pside][x/pside]--;
+			breakParticules(x/pside, y/pside, 1, pside, 0.1);
+		}
 		Pipe.list.remove(this);
 		if (this.input) this.input.pipeOut.remove(this);
 		if (this.output) this.output.pipeIn.remove(this);

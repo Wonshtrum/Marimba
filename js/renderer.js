@@ -33,9 +33,8 @@ let dR = 0.01;
 let dG = 0.025;
 let dB = 0.03;
 let d = 10;
-const rnd = Math.random;
 for (let i = 0 ; i < 0 ; i++)
-	new Particule(rnd()*d, rnd()*d, 2, rnd(), rnd(), rnd(), 0.8);
+	new Particule(rnd()*d, rnd()*d, 1, rnd(), rnd(), rnd(), 0.8, 20, rnd(), rnd(), rnd(), 0, 200, 0.1*rnd(), 0.1*rnd());
 
 const render = () => {
 	R += dR;
@@ -63,7 +62,7 @@ const render = () => {
 	
 	bParticule.bind();
 	bParticule.begin();
-	for (let particule of Particule.list) {
+	for (let particule of Particule.list.copy()) {
 		particule.update();
 		particule.draw(bParticule);
 	}

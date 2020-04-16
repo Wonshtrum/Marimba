@@ -60,10 +60,10 @@ html, body {
 	margin: 3%;
 	color: wheat;
 	font-family: Aniron;
-	font-size: 3vw;
-	line-height: 1em;
+	font-size: 2vw;
+	line-height: 1.5em;
 	opacity: 0;
-	/*transition: opacity 1s;*/
+	transition: opacity 1s;
 }
 #narrative.show {
 	opacity: 1;
