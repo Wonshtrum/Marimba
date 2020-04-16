@@ -46,10 +46,26 @@ class Scene {
 		}
 		resize();
 	}
+	reset() {
+		for (let i = 0 ; i < Tile.list.length ; i++) {
+			let tile = Tile.list[i];
+			if (tile instanceof Flask) {
+				if (i < this.objList.length) {
+					tile.setLevel(this.objList[i][5]);
+				} else {
+					tile.setLevel(0);
+				}
+			}
+		}
+		for (let pipe of Pipe.list) {
+			pipe.liquid = Array(pipe.liquid.length);
+		}
+	}
 }
 
 class SceneManager {
 	constructor(scenes) {
+		this.physics = false;
 		this.scenes = scenes;
 		this.currentScene = -1;
 		this.currentNarrative = 0;
@@ -58,6 +74,16 @@ class SceneManager {
 	}
 	addScene(name, row, col, objList, pipeList, slotList, narrative) {
 		this.scenes.push(new Scene(name, row, col, objList, pipeList, slotList, narrative));
+	}
+	start() {
+		this.physics = true;
+	}
+	stop() {
+		this.physics = false;
+	}
+	reset() {
+		this.stop();
+		this.scenes[this.currentScene].reset();
 	}
 	clear() {
 		clearInterval(this.loop);
@@ -152,7 +178,7 @@ sceneManager.addScene(
 
 	[[-1, false], [3, true], [2, false], [9, true], [4, false]],
 
-	[["Hello\nici", 0, none, none, 0, none, none],
+	[["Hello\nworld!", 0, none, none, 0, none, none],
 	 ["This", 0, none, 0, none, none, none],
 	 ["is", none, 0, 0, none, none, none],
 	 ["a", none, 0, none, 0, none, none],

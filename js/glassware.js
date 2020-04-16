@@ -130,7 +130,7 @@ class Flask extends Tile {
 		return false;
 	}
 	anchor(x, y) {
-		return this.class.anchors[this.size-1][y-5*this.y][x-5*this.x];
+		return Pipe.mat[y][x] === 0 && this.class.anchors[this.size-1][y-5*this.y][x-5*this.x];
 	}
 	setLevel(level) {
 		this.level = level

@@ -47,7 +47,7 @@ const render = () => {
 	mouse.drawRect(bBase);
 
 	for (let pipe of Pipe.list) {
-		pipe.flow();
+		if (sceneManager.physics) pipe.flow();
 		pipe.draw(bBase);
 	}
 	for (let tile of Tile.list)

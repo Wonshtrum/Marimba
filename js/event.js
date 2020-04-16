@@ -141,13 +141,25 @@ mouse.draw = function(ctx) {
 	}
 };
 
-const keyDispatcher = e => {
+const keyDispatcher = function(e, fire) {
+	if (!fire) {
+		if (this.key === e.key) this.fired = false;
+		return;
+	}
+	if (this.fired) return;
+	this.fired = true;
+	this.key = e.key;
 	if (e.key === "ArrowRight") {
 		sceneManager.nextNarrative();
 	} else if (e.key === "ArrowLeft") {
 		sceneManager.previousNarrative();
+	} else if (e.key === " ") {
+		sceneManager.physics = !sceneManager.physics;
+	} else if (e.key === "Enter") {
+		sceneManager.reset();
 	}
 }
+keyDispatcher.fired = false;
 
 select(0);
 resize();
@@ -161,4 +173,5 @@ document.onmousedown = e => mouse.start(e);
 document.onmouseup = e => mouse.end(e);
 document.onwheel = e => mouse.wheel(e);
 document.oncontextmenu = e => e.preventDefault();
-document.onkeydown = e => keyDispatcher(e);
+document.onkeydown = e => keyDispatcher(e, true);
+document.onkeyup = e => keyDispatcher(e, false);
