@@ -1,11 +1,10 @@
 const clamp = (x, a, b) => {
-	return a > x ? a:b < x ? b : x;
+	return b < x ? b : a > x ? a : x;
 };
 
 let canvasOffset;
 const resize = () => {
 	canvasOffset = canvas.getBoundingClientRect();
-	//narrative.style.lineHeight = canvas.offsetHeight;
 }
 const xyOnCanvas = (e) => {
 	let x = Math.floor(width*(e.x-canvasOffset.x)/canvas.offsetWidth);
@@ -62,13 +61,15 @@ mouse.start = function(e) {
 };
 mouse.end = function(e) {
 	if (e.which === 3 && e.target === canvas) {
-		if (this.tile) {
-			if (this.tile.shelf && !(this.tile instanceof Shelf)) {
+		let [tx, ty] = posToTile(this.rx, this.ry);
+		let tile = Tile.mat[ty][tx];
+		if (tile) {
+			if (tile.shelf && !(tile instanceof Shelf)) {
 				if (this.tile.destroy(true, false)) {
-					new Shelf(this.tile.x, this.tile.y, this.tile.size);
+					new Shelf(tile.x, tile.y, tile.size);
 				}
 			} else {
-				this.tile.propagate(true);
+				tile.propagate(true);
 			}
 		} else {
 			Pipe.searchAndCut(this.px, this.py);
@@ -136,7 +137,7 @@ mouse.draw = function(ctx) {
 			ctx.drawQuad(this.px*pside, this.py*pside, pside, pside, 9, full, 0.4, .6, 0.7);
 		}
 	} else {
-		ctx.drawQuad(this.tx*side, this.ty*side, this.size*side, this.size*side, this.selected, 0, 0.4, .6, 0.7);
+		//ctx.drawQuad(this.tx*side, this.ty*side, this.size*side, this.size*side, this.selected, 0, 0.4, .6, 0.7);
 	}
 };
 

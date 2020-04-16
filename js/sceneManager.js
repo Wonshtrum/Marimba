@@ -44,6 +44,7 @@ class Scene {
 			slots.children[slot].setCount(this.slotList[slot][0]);
 			slots.children[slot].big = this.slotList[slot][1];
 		}
+		resize();
 	}
 }
 

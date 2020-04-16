@@ -4,8 +4,6 @@ let va1 = new VertexArray([
 	2, 2, 1, 0,
 	0, 2, 0, 0], [2, 2], gl.STATIC_DRAW);
 
-width = 0;
-height = 0;
 //       0   1        2     3       4
 //tex = [BG, SPRITES, main, bright, tmpBlur]
 fboBase = new FrameBuffer(width, height, 2, 2);

@@ -21,7 +21,7 @@ const validPosition = (x, y, size, inPlace) => {
 const range = (x, r) => x+rnd()*r;
 const breakParticules = (x, y, size, side, scale) => {
 	scale = getOrElse(scale, 1);
-	for (let i = 0 ; i < 3 ; i++) {
+	for (let i = 0 ; i < 5 ; i++) {
 		setTimeout(() => {
 			for (let j = 0 ; j < particulesPerSize*size*scale ; j++) {
 				new Particule(

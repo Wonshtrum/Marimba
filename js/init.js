@@ -16,7 +16,6 @@ const levelBase = 24;
 //global variables used for scale
 let row, col, rowH, colH, width, height;
 const setDimensions = (newRow, newCol) => {
-	console.log(newRow, newCol);
 	row = newRow;
 	col = newCol;
 	rowH = row/2;
@@ -33,6 +32,7 @@ const canvas = document.getElementById('myCan');
 const slots = document.getElementById("slots");
 const background = document.getElementById("background");
 const narrative = document.getElementById("narrative");
+setDimensions(1, 1);
 
 //create the inventory slots and link them to the mouse
 let mouse;
@@ -86,6 +86,7 @@ const select = slot => {
 	}
 	mouse.size = slots.children[slot].size;
 	mouse.selected = slot;
+	mouse.calculate();
 	slots.children[slot].classList.add("selected");
 }
 
