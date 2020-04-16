@@ -107,6 +107,8 @@ Tile.tileFromPipe = (x, y) => Tile.mat[Math.floor(y/5)][Math.floor(x/5)];
 class Flask extends Tile {
 	constructor(x, y, size, shelf, level, immutable) {
 		super(x, y, size, shelf, immutable);
+		this.maxLevel = this.class.maxLevel*this.size*this.size*this.size;
+		this.minLevel = this.class.minLevel*this.size;
 		this.level = 0;
 		this.fill = 0;
 		this.setLevel(level);
@@ -132,7 +134,17 @@ class Flask extends Tile {
 	}
 	setLevel(level) {
 		this.level = level
-		this.fill = 0.6*level/(6*this.size*this.size);
+		this.fill = 0.6*level/(levelBase*this.size*this.size*this.size);
+	}
+	pump() {
+		if (this.level <= this.minLevel) return false;
+		this.setLevel(this.level-1);
+		return true;
+	}
+	push() {
+		if (this.level >= this.maxLevel) return false;
+		this.setLevel(this.level+1);
+		return true;
 	}
 };
 
@@ -155,8 +167,8 @@ Bescher.id = 1;
 class Distillation extends Flask {
 	setLevel(level) {
 		this.level = level
-		if (level > 3) level += 2
-		this.fill = 0.6*level/(6*this.size*this.size);
+		if (level > levelBase/2) level += levelBase/3;
+		this.fill = 0.6*level/(levelBase*this.size*this.size*this.size);
 	}
 	draw(ctx) {
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 2, this.fill, R, G, B);
@@ -165,12 +177,16 @@ class Distillation extends Flask {
 };
 Distillation.id = 2;
 
-//ANCHORS FOR FLASKS
+//STATIC MEMBERS FOR FLASKS
 for (let flask of [Erlenmeyer, Bescher, Distillation]) {
 	flask.anchors = [
 		Array.from({length:5}, ()=>Array(5)),
 		Array.from({length:10}, ()=>Array(10))];
+	flask.maxLevel = levelBase;
+	flask.minLevel = 0;
 }
+Distillation.minLevel = Math.floor(2*levelBase/3);
+
 for (let [x, y, s, t] of [[2,0,0,1],[4,0,1,1],[5,0,1,1]])
 	Erlenmeyer.anchors[s][y][x] = t;
 for (let [x, y, s, t] of [[1,0,0,-1],[2,0,0,1],[3,0,0,-1],[3,0,1,-1],[4,0,1,1],[5,0,1,1],[6,0,1,-1]])

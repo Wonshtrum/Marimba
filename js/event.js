@@ -33,7 +33,7 @@ mouse.update = function() {
 }
 mouse.checkValid = function() {
 	if (this.selected === 0 && this.save) {
-		Pipe.fromPoints(this.save.px, this.save.py, this.px, this.py, false);
+		Pipe.fromPoints(this.save.px, this.save.py, this.px, this.py, false, this.save.tile, this.tile);
 	} else if (this.selected === 3) {
 		this.isValidPosition = (this.tile && !this.tile.shelf && !this.tile.immutable && this.tile.size === this.size && this.tile.x === this.tx && this.tile.y === this.ty) || (validPosition(this.tx, this.ty, this.size) && !(this.tile instanceof Shelf));
 	} else if (this.selected !== 0) {
@@ -85,8 +85,7 @@ mouse.end = function(e) {
 			Pipe.list.pop();
 		}
 		if (!this.tile || this.tile.anchor(this.px, this.py) !== -1) return;
-		let pipe = Pipe.fromPoints(save.px, save.py, this.px, this.py, true);
-		pipe.connect(save.tile, this.tile);
+		Pipe.fromPoints(save.px, save.py, this.px, this.py, true, save.tile, this.tile);
 	}
 	if (e.target === canvas) {
 		if (this.selected === 3 && this.isValidPosition && this.tile) {
@@ -152,7 +151,10 @@ const keyDispatcher = e => {
 select(0);
 resize();
 
-window.onresize = resize();
+window.onresize = () => {
+	resize();
+	setTimeout(resize, 1000);
+};
 document.onmousemove = e => mouse.move(e);
 document.onmousedown = e => mouse.start(e);
 document.onmouseup = e => mouse.end(e);

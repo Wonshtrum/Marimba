@@ -65,10 +65,14 @@ class Pipe {
 			x += dx;
 			y += dy;
 		}
-		if (persistent)
+		if (persistent) {
+			let [inx, iny] = posToTile(...this.path[0]);
+			let [outx, outy] = posToTile(...this.path.last());
+			this.connect(Tile.mat[iny][inx], Tile.mat[outy][outx]);
 			for (let [x, y] of this.path)
 				Pipe.mat[y/pside][x/pside]++;
-		this.path.reverse();
+			this.path.reverse();
+		}
 		if (full)
 			this.liquid = Array.from({length:this.path.length}, ()=>true);
 		else
@@ -94,16 +98,24 @@ class Pipe {
 		if (this.output) this.output.pipeIn.remove(this);
 		return true;
 	}
-	push(n) {
-		if (!this.persistent) return;
-		for (let i = 0 ; i < n ; i++)
-			this.liquid.push(true);
-	}
 	flow() {
-		if (!this.persistent) return;
+		if (!this.persistent || !this.input || !this.output) return false;
+		if (this.liquid[0]) {
+			if (this.output.push()) {
+				if (!(this.output instanceof Distillation)) {
+					new Particule(
+						this.path[0][0]+4, this.path[0][1]+pside-2,
+						3, R, G, B, 0.8,
+						1, 1, 1, 1, 0.5,
+						13*this.output.size, 0.08*rnd()-0.04, 0.2+0.2*rnd()
+					);
+				}
+			} else {
+				return false;
+			}
+		}
 		this.liquid.shift(0);
-		if (this.liquid.length < this.path.length)
-			this.liquid.push(false);
+		this.liquid.push(this.input.pump());
 	}
 	draw(ctx) {
 		let x, y, t;
@@ -120,7 +132,7 @@ Pipe.last = true;
 Pipe.list = [];
 Pipe.mat = Array.from({length:row*5}, () => Array(col*5).fill(0));
 
-Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
+Pipe.fromPoints = (x0, y0, x1, y1, persistent, tileOut, tileIn) => {
 	if (x0 === x1 && y0 === y1) return;
 	let pad = 1;
 	let [ox, oy] = [x0, y0];
@@ -132,11 +144,20 @@ Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
 	let path = [];
 	let tmp = [0, 0];
 
-	let full = mouse.tile && mouse.tile.anchor(mouse.px, mouse.py) === -1;
+	let full = tileOut && tileIn && tileIn.anchor(mouse.px, mouse.py) === -1;
+	let s0 = tileOut.size*5;
+	let s1 = full ? tileIn.size*2 : 0;
+	if (tileOut instanceof Distillation) {
+		s0 = 2;
+		if (py0 > 0) {
+			oy += 1;
+			path.push([0, -1]);
+		}
+	}
 	if (py0 == 0) {
-		oy += pad;
+		oy += s0;
 		y0 -= 1;
-		path.push([0, -pad-1]);
+		path.push([0, -1-s0]);
 	} else if (px0 < 2) {
 		ox += pad;
 		x0 -= 2;
@@ -152,7 +173,7 @@ Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
 	if (full) {
 		if (py1 == 0) {
 			y1 -= 1;
-			tmp = [0, pad+1];
+			tmp = [0, 1+s1];
 		} else if (px1 < 2) {
 			x1 -= 2;
 			tmp = [pad+2, 0];
@@ -175,10 +196,11 @@ Pipe.fromPoints = (x0, y0, x1, y1, persistent) => {
 		path.last()[1] += tmp[1];
 	} else
 		path.push(tmp);
-	return new Pipe(ox, oy, path, persistent, full);
+	return new Pipe(ox, oy, path, persistent, full && !persistent);
 };
 
 Pipe.searchAndCut = (x, y) => {
+	console.log(Pipe.mat[y][x]);
 	if (Pipe.mat[y][x] > 0) {
 		for (let pipe of Pipe.list.reverse()) {
 			if (pipe.contains(x, y) && pipe.destroy()) return true;

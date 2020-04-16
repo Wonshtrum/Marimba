@@ -11,6 +11,7 @@ const usesPerSize = 1;
 const nbSlots = 5;
 const none = "";
 const second = 1000;
+const levelBase = 24;
 
 //global variables used for scale
 let row, col, rowH, colH, width, height;

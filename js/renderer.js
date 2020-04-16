@@ -49,8 +49,6 @@ const render = () => {
 	mouse.drawRect(bBase);
 
 	for (let pipe of Pipe.list) {
-		if (Math.random()>0.95)
-			pipe.push(Math.ceil(Math.random()*5));
 		pipe.flow();
 		pipe.draw(bBase);
 	}

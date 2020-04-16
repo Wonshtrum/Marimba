@@ -23,6 +23,7 @@ class Scene {
 	}
 	load() {
 		console.log("Loading scene", this.name);
+		narrative.classList.remove("show");
 		setDimensions(this.row, this.col);
 		updateShaders();
 		updateFbos();
@@ -59,6 +60,7 @@ class SceneManager {
 	}
 	clear() {
 		clearInterval(this.loop);
+		narrative.classList.remove("show");
 	}
 	loadScene(index) {
 		this.clear();
@@ -67,7 +69,7 @@ class SceneManager {
 		this.maxNarrative = this.scenes[index].narrative.length-1;
 		this.scenes[index].load();
 		this.loop = setInterval(render, 35);
-		this.nextNarrative();
+		setTimeout(() => this.nextNarrative(), second+1);
 	}
 	reload() {this.loadScene(this.currentScene);}
 	nextScene() {this.loadScene(this.currentScene+1);}
@@ -111,7 +113,7 @@ sceneManager = new SceneManager([]);
 sceneManager.addScene(
 	"SCENE_0",
 	3, 6,
-	[],
+	[[0,1,1,2,false,192]],
 	[],
 	[[-1, true], [-1, true], [-1, true], [-1, true], [-1, true]],
 	[]
@@ -138,9 +140,9 @@ sceneManager.addScene(
 	 [0,0,1,0,0,1,0,1,0,0],
 	 [0,0,0,0,1,1,0,0,0,0]],
 	[[0,0,0,0,0,0,0,0,0,0],
-	 [0,0,0,3,0,6,0,0,0,0],
-	 [0,0,5,0,0,6,0,0,0,0],
-	 [7,0,22,0,2,6,0,0,0,0],
+	 [0,0,0,3,0,12,0,0,0,0],
+	 [0,0,5,0,0,24,0,0,0,0],
+	 [0,0,96,0,18,24,0,0,0,0],
 	 [0,0,0,0,0,1,0,0,0,0]]),
 
 	[[[3,1,2,4],[0,-5],[4,0],[0,15]],
