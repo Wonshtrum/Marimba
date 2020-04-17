@@ -138,8 +138,6 @@ mouse.draw = function(ctx) {
 		} else {
 			ctx.drawQuad(this.px*pside, this.py*pside, pside, pside, 9, full, 0.4, .6, 0.7);
 		}
-	} else {
-		//ctx.drawQuad(this.tx*side, this.ty*side, this.size*side, this.size*side, this.selected, 0, 0.4, .6, 0.7);
 	}
 };
 
@@ -165,6 +163,8 @@ const keyDispatcher = function(e, fire) {
 			sceneManager.start();
 	} else if (e.key === "Enter") {
 		sceneManager.reset();
+	} else if (e.key === "Backspace") {
+		sceneManager.reload();
 	}
 }
 keyDispatcher.fired = false;

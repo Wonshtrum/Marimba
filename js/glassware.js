@@ -112,7 +112,7 @@ class Flask extends Tile {
 		this.minLevel = this.class.minLevel*this.size;
 		this.fill = 0;
 		this.level = 0;
-		this.liquid = liquid.copy();
+		this.liquid = liquid ? liquid.copy() : [];
 		this.updateLevel();
 		this.pipeIn = [];
 		this.pipeOut = [];
@@ -181,6 +181,11 @@ class Distillation extends Flask {
 		let level = this.level;
 		if (level > levelBase/2) level += levelBase/3;
 		this.fill = 0.6*level/levelBase;
+	}
+	anchor(x, y) {
+		let anchor = super.anchor(x, y);
+		if (anchor === -1 && this.pipeIn.length > 0) return 0;
+		return anchor;
 	}
 	push(droplet) {
 		if (this.level === this.maxLevel && this.y > 0 && Tile.mat[this.y-1][this.x]) {

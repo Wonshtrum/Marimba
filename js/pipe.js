@@ -97,7 +97,7 @@ class Pipe {
 	}
 	flow() {
 		if (!this.persistent) return false;
-		if (this.liquid[0]) {
+		if (this.liquid[0] !== false) {
 			if (this.output.push(this.liquid[0])) {
 				if (!(this.output instanceof Distillation)) {
 					new Particule(
@@ -118,10 +118,10 @@ class Pipe {
 		let x, y, t;
 		for (let i = 0 ; i < this.path.length ; i++) {
 			[x, y, t] = this.path[i];
-			if (this.liquid[i])
-				ctx.drawQuad(x, y, pside, pside, t, full, R, G, B);
-			else
+			if (this.liquid[i] === false)
 				ctx.drawQuad(x, y, pside, pside, t, 0, 0, 0, 0);
+			else
+				ctx.drawQuad(x, y, pside, pside, t, full, R, G, B);
 		}
 	}
 };

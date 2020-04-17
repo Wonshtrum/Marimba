@@ -1,11 +1,11 @@
+const potion = e => e ? Array(e[0]).fill(e[1]) : [];
+
 const matToList = (row, col, obj, size, shelf, level) => {
 	list = [];
 	for (let i = 0 ; i < col ; i++) {
 		for (let j = 0 ; j < row ; j++) {
 			if (obj[j][i]) {
-				let fill = level[j][i];
-				let liquid = fill ? Array(fill[0]).fill(fill[1]) : [];
-				list.push([obj[j][i]-1, i, j, size[j][i]+1, shelf[j][i] === 1, liquid]);
+				list.push([obj[j][i]-1, i, j, size[j][i]+1, shelf[j][i] === 1, potion(level[j][i])]);
 			} else if (shelf[j][i]) {
 				list.push([3, i, j, size[j][i]+1]);
 			}
@@ -75,6 +75,7 @@ class SceneManager {
 		this.currentScene = -1;
 		this.currentNarrative = 0;
 		this.maxNarrative = 0;
+		this.narrativeTimeout = 0;
 		this.loop;
 	}
 	addScene(name, row, col, objList, pipeList, slotList, narrative) {
@@ -98,18 +99,17 @@ class SceneManager {
 		this.stop();
 		this.scenes[this.currentScene].reset();
 	}
-	clear() {
-		clearInterval(this.loop);
-		narrative.classList.remove("show");
-	}
 	loadScene(index) {
-		this.clear();
+		clearInterval(this.loop);
+		clearTimeout(this.narrativeTimeout);
+		narrative.classList.remove("show");
+		this.stop();
 		this.currentScene = index;
 		this.currentNarrative = -1;
 		this.maxNarrative = this.scenes[index].narrative.length-1;
 		this.scenes[index].load();
 		this.loop = setInterval(render, 35);
-		setTimeout(() => this.nextNarrative(), second+1);
+		this.narrativeTimeout = setTimeout(() => this.nextNarrative(), second+1);
 	}
 	reload() {this.loadScene(this.currentScene);}
 	nextScene() {this.loadScene(this.currentScene+1);}
@@ -153,7 +153,7 @@ sceneManager = new SceneManager([]);
 sceneManager.addScene(
 	"SCENE_0",
 	3, 6,
-	[[0,1,1,2,false,192]],
+	[[0, 1, 1, 2, false, potion([192, 0])]],
 	[],
 	[[-1, true], [-1, true], [-1, true], [-1, true], [-1, true]],
 	[]

@@ -54,6 +54,7 @@ html, body {
 }
 
 #narrative {
+	pointer-events: none;
 	display: grid;
 	align-items: center;
 	position: absolute;
