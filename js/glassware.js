@@ -103,15 +103,17 @@ class Tile {
 Tile.list = [];
 Tile.mat = Array.from({length: row}, () => Array(col));
 Tile.tileFromPipe = (x, y) => Tile.mat[Math.floor(y/5)][Math.floor(x/5)];
+Tile.all = type => Tile.list.filter(t => t instanceof type);
 
 class Flask extends Tile {
-	constructor(x, y, size, shelf, level, immutable) {
+	constructor(x, y, size, shelf, liquid, immutable) {
 		super(x, y, size, shelf, immutable);
 		this.maxLevel = this.class.maxLevel*this.size*this.size*this.size;
 		this.minLevel = this.class.minLevel*this.size;
-		this.level = 0;
 		this.fill = 0;
-		this.setLevel(level);
+		this.level = 0;
+		this.liquid = liquid.copy();
+		this.updateLevel();
 		this.pipeIn = [];
 		this.pipeOut = [];
 	}
@@ -130,20 +132,30 @@ class Flask extends Tile {
 		return false;
 	}
 	anchor(x, y) {
-		return Pipe.mat[y][x] === 0 && this.class.anchors[this.size-1][y-5*this.y][x-5*this.x];
+		if (this.pipeIn.some(pipe => pipe.contains(x, y)) || this.pipeOut.some(pipe => pipe.contains(x, y))) return 0;
+		return this.class.anchors[this.size-1][y-5*this.y][x-5*this.x];
 	}
-	setLevel(level) {
-		this.level = level
-		this.fill = 0.6*level/(levelBase*this.size*this.size*this.size);
+	updateLevel() {
+		this.level = this.liquid.length;
+		this.updateFill();
+	}
+	updateFill() {
+		this.fill = 0.6*this.level/(levelBase*this.size*this.size*this.size);
+	}
+	isfull() {
+		return this.level >= this.maxLevel;
 	}
 	pump() {
 		if (this.level <= this.minLevel) return false;
-		this.setLevel(this.level-1);
-		return true;
+		this.level--;
+		this.updateFill()
+		return this.liquid.shift(0);
 	}
-	push() {
-		if (this.level >= this.maxLevel) return false;
-		this.setLevel(this.level+1);
+	push(droplet) {
+		if (this.isfull()) return false;
+		this.level++;
+		this.updateFill();
+		this.liquid.push(droplet);
 		return true;
 	}
 };
@@ -165,16 +177,19 @@ class Bescher extends Flask {
 Bescher.id = 1;
 
 class Distillation extends Flask {
-	setLevel(level) {
-		this.level = level
+	updateFill() {
+		let level = this.level;
 		if (level > levelBase/2) level += levelBase/3;
-		this.fill = 0.6*level/(levelBase*this.size*this.size*this.size);
+		this.fill = 0.6*level/levelBase;
 	}
-	push() {
-		if (this.level === this.maxLevel && this.y > 0 && Tile.mat[this.y-1][this.x] instanceof Distillation && Tile.mat[this.y-1][this.x].push()) {
-			this.pump();
+	push(droplet) {
+		if (this.level === this.maxLevel && this.y > 0 && Tile.mat[this.y-1][this.x]) {
+			let topTower = Tile.mat[this.y-1][this.x];
+			if (!topTower.isfull()) {
+				topTower.push(this.pump());
+			}
 		}
-		return super.push();
+		return super.push(droplet);
 	}
 	draw(ctx) {
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 2, this.fill, R, G, B);
@@ -208,11 +223,9 @@ class Shelf extends Tile {
 Shelf.id = 3;
 
 class Spout extends Tile {
-	constructor(x, y, size, shelf, lit, immutable) {
+	constructor(x, y, size, shelf, immutable) {
 		super(x, y, size, shelf, immutable);
-		this.level = 0;
 		this.fill = 0;
-		this.lit(lit);
 		this.tick = 0;
 		this.frame = 0;
 		this.perFrame = 4;

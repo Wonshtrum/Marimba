@@ -1,11 +1,14 @@
-const matToList = (row, col, obj, size, shelf, fill) => {
+const matToList = (row, col, obj, size, shelf, level) => {
 	list = [];
 	for (let i = 0 ; i < col ; i++) {
 		for (let j = 0 ; j < row ; j++) {
-			if (obj[j][i])
-				list.push([obj[j][i]-1, i, j, size[j][i]+1, shelf[j][i] === 1, fill[j][i]]);
-			else if (shelf[j][i])
+			if (obj[j][i]) {
+				let fill = level[j][i];
+				let liquid = fill ? Array(fill[0]).fill(fill[1]) : [];
+				list.push([obj[j][i]-1, i, j, size[j][i]+1, shelf[j][i] === 1, liquid]);
+			} else if (shelf[j][i]) {
 				list.push([3, i, j, size[j][i]+1]);
+			}
 		}
 	}
 	return list;
@@ -51,14 +54,15 @@ class Scene {
 			let tile = Tile.list[i];
 			if (tile instanceof Flask) {
 				if (i < this.objList.length) {
-					tile.setLevel(this.objList[i][5]);
+					tile.liquid = this.objList[i][5].copy();
 				} else {
-					tile.setLevel(0);
+					tile.liquid = [];
 				}
+				tile.updateLevel();
 			}
 		}
 		for (let pipe of Pipe.list) {
-			pipe.liquid = Array(pipe.liquid.length);
+			pipe.liquid = Array(pipe.liquid.length).fill(false);
 		}
 	}
 }
@@ -176,9 +180,9 @@ sceneManager.addScene(
 	 [0,0,1,0,0,1,0,1,0,0],
 	 [0,0,0,0,1,1,0,0,0,0]],
 	[[0,0,0,0,0,0,0,0,0,0],
-	 [0,0,0,3,0,12,0,0,0,0],
-	 [0,0,5,0,0,24,0,0,0,0],
-	 [0,0,96,0,18,24,0,0,0,0],
+	 [0,0,0,[3,2],0,[12,1],0,0,0,0],
+	 [0,0,[5,3],0,0,[24,0],0,0,0,0],
+	 [0,0,[96,1],0,[18,2],[24,3],0,0,0,0],
 	 [0,0,0,0,0,0,0,0,0,0]]),
 
 	[[[3,1,2,4],[0,-5],[4,0],[0,15]],

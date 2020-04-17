@@ -73,10 +73,7 @@ class Pipe {
 				Pipe.mat[y/pside][x/pside]++;
 			this.path.reverse();
 		}
-		if (full)
-			this.liquid = Array.from({length:this.path.length}, ()=>true);
-		else
-			this.liquid = Array(this.path.length);
+		this.liquid = Array.from({length:this.path.length}, () => full === true);
 	}
 	connect(input, output) {
 		this.input = input;
@@ -99,9 +96,9 @@ class Pipe {
 		return true;
 	}
 	flow() {
-		if (!this.persistent || !this.input || !this.output) return false;
+		if (!this.persistent) return false;
 		if (this.liquid[0]) {
-			if (this.output.push()) {
+			if (this.output.push(this.liquid[0])) {
 				if (!(this.output instanceof Distillation)) {
 					new Particule(
 						this.path[0][0]+4, this.path[0][1]+pside-2,
