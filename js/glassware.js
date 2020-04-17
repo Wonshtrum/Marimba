@@ -170,6 +170,12 @@ class Distillation extends Flask {
 		if (level > levelBase/2) level += levelBase/3;
 		this.fill = 0.6*level/(levelBase*this.size*this.size*this.size);
 	}
+	push() {
+		if (this.level === this.maxLevel && this.y > 0 && Tile.mat[this.y-1][this.x] instanceof Distillation && Tile.mat[this.y-1][this.x].push()) {
+			this.pump();
+		}
+		return super.push();
+	}
 	draw(ctx) {
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 2, this.fill, R, G, B);
 		super.draw(ctx);

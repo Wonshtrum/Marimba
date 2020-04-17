@@ -65,6 +65,7 @@ class Scene {
 
 class SceneManager {
 	constructor(scenes) {
+		this.frames = 0;
 		this.physics = false;
 		this.scenes = scenes;
 		this.currentScene = -1;
@@ -76,10 +77,18 @@ class SceneManager {
 		this.scenes.push(new Scene(name, row, col, objList, pipeList, slotList, narrative));
 	}
 	start() {
+		select(0);
+		mouse.end({which:1, target:none});
 		this.physics = true;
+		for (let tile of Tile.list)
+			if (tile instanceof Spout)
+				tile.lit(true);
 	}
 	stop() {
 		this.physics = false;
+		for (let tile of Tile.list)
+			if (tile instanceof Spout)
+				tile.lit(false);
 	}
 	reset() {
 		this.stop();
@@ -170,7 +179,7 @@ sceneManager.addScene(
 	 [0,0,0,3,0,12,0,0,0,0],
 	 [0,0,5,0,0,24,0,0,0,0],
 	 [0,0,96,0,18,24,0,0,0,0],
-	 [0,0,0,0,0,1,0,0,0,0]]),
+	 [0,0,0,0,0,0,0,0,0,0]]),
 
 	[[[3,1,2,4],[0,-5],[4,0],[0,15]],
 	 [[5,1,2,2],[0,-5],[-4,0],[0,15]],

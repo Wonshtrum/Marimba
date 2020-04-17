@@ -35,6 +35,7 @@ for (let i = 0 ; i < 0 ; i++)
 	new Particule(rnd()*d, rnd()*d, 1, rnd(), rnd(), rnd(), 0.8, 20, rnd(), rnd(), rnd(), 0, 200, 0.1*rnd(), 0.1*rnd());
 
 const render = () => {
+	sceneManager.frames++;
 	R += dR;
 	G += dG;
 	B += dB;

@@ -53,6 +53,7 @@ mouse.calculate = function() {
 	this.checkValid();
 };
 mouse.start = function(e) {
+	if (sceneManager.physics) return;
 	if (e.which === 1 && this.selected === 0) {
 		if (!this.tile || this.tile.anchor(this.px, this.py) !== 1) return;
 		mouse.save = {};
@@ -60,6 +61,7 @@ mouse.start = function(e) {
 	}
 };
 mouse.end = function(e) {
+	if (sceneManager.physics) return;
 	if (e.which === 3 && e.target === canvas) {
 		let [tx, ty] = posToTile(this.rx, this.ry);
 		let tile = Tile.mat[ty][tx];
@@ -85,7 +87,7 @@ mouse.end = function(e) {
 			Pipe.last = true;
 			Pipe.list.pop();
 		}
-		if (!this.tile || this.tile.anchor(this.px, this.py) !== -1) return;
+		if (e.target !== canvas || !this.tile || this.tile.anchor(this.px, this.py) !== -1) return;
 		Pipe.fromPoints(save.px, save.py, this.px, this.py, true, save.tile, this.tile);
 	}
 	if (e.target === canvas) {
@@ -143,18 +145,24 @@ mouse.draw = function(ctx) {
 
 const keyDispatcher = function(e, fire) {
 	if (!fire) {
-		if (this.key === e.key) this.fired = false;
+		if (keyDispatcher.key === e.key) keyDispatcher.fired = false;
 		return;
+	} else if (sceneManager.frames - keyDispatcher.last > 60) {
+		keyDispatcher.fired = false;
 	}
-	if (this.fired) return;
-	this.fired = true;
-	this.key = e.key;
+	if (keyDispatcher.fired) return;
+	keyDispatcher.last = sceneManager.frames;
+	keyDispatcher.fired = true;
+	keyDispatcher.key = e.key;
 	if (e.key === "ArrowRight") {
 		sceneManager.nextNarrative();
 	} else if (e.key === "ArrowLeft") {
 		sceneManager.previousNarrative();
 	} else if (e.key === " ") {
-		sceneManager.physics = !sceneManager.physics;
+		if (sceneManager.physics)
+			sceneManager.stop();
+		else
+			sceneManager.start();
 	} else if (e.key === "Enter") {
 		sceneManager.reset();
 	}

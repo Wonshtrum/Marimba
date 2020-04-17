@@ -78,6 +78,7 @@ for (let i = 0 ; i < nbSlots ; i++) {
 	slot.slotCount = slotCount;
 }
 const select = slot => {
+	if (sceneManager.physics) return;
 	for (let i = 0 ; i < nbSlots ; i++) {
 		slots.children[i].classList.remove("selected");
 	}
