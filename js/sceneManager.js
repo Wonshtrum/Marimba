@@ -93,7 +93,7 @@ class SceneManager {
 	}
 	complete() {
 		this.completed = !this.interupted && Vessel.list.every(e => e.completed);
-		alert("Bien joué !");
+		if (this.completed) alert("Bien joué !");
 	}
 	start() {
 		select(0);

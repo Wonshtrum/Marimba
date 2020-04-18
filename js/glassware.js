@@ -251,7 +251,7 @@ class Distillation extends Flask {
 	}
 	anchor(x, y) {
 		let anchor = super.anchor(x, y);
-		if (anchor === -1 && this.pipeIn.length > 0) return 0;
+		//if (anchor === -1 && this.pipeIn.length > 0) return 0;
 		return anchor;
 	}
 	push(droplet) {
@@ -291,6 +291,9 @@ class Vessel extends Flask {
 		super(x, y, size, shelf, [], immutable);
 		this.goal = [goal[0], goal[1].print()];
 		Vessel.list.push(this);
+	}
+	molecule() {
+		return super.molecule()+"\n\n"+this.goal[0]+" "+this.goal[1];
 	}
 	push(droplet) {
 		let pushed = super.push(droplet);

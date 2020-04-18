@@ -38,13 +38,15 @@ sceneManager.addScene(
 	 ["tandis que la grande verrerie a une contenance maximale de 192 unités", 0, none, none, 0, "40%", none],
 	 ["Ces fioles sphériques sont les témoins de votre réussite, seul leur contenu final compte", "3vw", none, 0, none, "58%", none],
 	 ["Pour commencer je vous demande simplement de transvaser 24 ◉ dans la petite fiole et 192 ◀ dans la grande", ...onTop],
-	 ["Pour cela vous devez utiliser des tuyaux", ...onTop],
+	 ["En passant votre curseur vide sur les fioles vous pouvez voir, sous la composition de leur contenue, le résultat attendu ☛", "2vw", none, "11vw", none, "71%", none],
+	 ["Afin d'effectuer le transfert vous devez utiliser des tuyaux", ...onTop],
 	 ["Vous pouvez en placer avec votre curseur vide ☛\n(déjà sélectionné)", 0, none, 0, none, none, none],
 	 ["En enfonçant le clic sur une sortie (indiquée en vert)\n☚", "2vw", none, none, "3vw", "32%", none],
 	 ["et en etirant le tuyaux jusqu'à une entrée (indiquée en rouge) ☛", "8vw", none, "15vw", none, "56%", none],
 	 ["si le placement est valide, le tuyaux doit s'illuminer, vous pouvez alors relacher la souris", ...onTop],
 	 ["Essayez !", ...onTop],
 	 ["Vous pouvez retirer tout élément de verrerie et tuyauterie avec le clic droit, sauf ceux que j'ai moi même posé bien sûr !", ...onTop],
+	 ["Essayez !", ...onTop],
 	 ["Une fois votre dispositif en place, vous pouvez appuyer sur la touche \"espace\" pour procéder à la réaction", ...onTop],
 	 ["Remarquez que le carré de votre curseur est rouge tant que la réaction est  en cours", ...onTop],
 	 ["Attention disciple ! Je vous interdis de modifier votre installation tant que la réaction est en cours !", ...onTop],
@@ -58,22 +60,27 @@ sceneManager.addScene(
 	false
 );
 
-
-/*sceneManager.addScene(
-	"PRESENTATION",
+sceneManager.addScene(
+	"NIV_2",
 	3, 6,
-	[[Erlenmeyer.id, 2, 1, 2, false, 0],
-	 [Bescher.id, 0, 2, 1, false, 0],
-	 [Distillation.id, 1, 2, 1, false, 0],
-	 [Spout.id, 4, 2, 1, false, 0],
-	 [Shelf.id, 5, 2, 1, false, 0],
+	[[Erlenmeyer.id, 2, 2, 1, false, [24, r1]],
+	 [Vessel.id, 3, 2, 1, false, [8, O]],
 	],
 	[],
-	emptyHand,
-	[["Vous serez amené à manipuler...", 0],
-	 ["des beschers...", 0],
-	 ["des colonnes de distillation", 0],
-	 ["des i", 0],
-	],
-	false
-);*/
+	[[-1, false], [0, false], [2, false], [2, false], [2, false]],
+	[["Bien disciple, passons à la distillation", ...onTop],
+	 ["Je vous prête 2 tours de distillation ☛\n\n\n2 étagères ☛\n\n\net 2 bruleurs ☛", none, 0, 0, none, "27%", none],
+	 ["C'est plus que le nécessaire", none, "10vw", 0, none, "30%", none],
+	 ["Vous pouvez selectionner un élément est tenter de le placer sur la table, votre curseur devient vert si la position est valide", ...onTop],
+	 ["Remarquez que vous pouvez poser une étagère sur un élément ou un élément dans étagère", ...onTop],
+	 ["Un élément ne peut être poser que sur la table ou sur une étagère", ...onTop],
+	 ["Je vous invite à monter et démonter plusieurs configurations pour vous faire la main", ...onTop],
+	 ["Maintenant que vous êtes familier avec le système de placement...", ...onTop],
+	 ["je vous rappelle qu'une tour de distillation placer au dessus d'un bruleur retire un élément au début et à la fin d'une chaine (si la chaine possède au moins 3 éléments)", ...onTop],
+	 ["Sachant cela, je vous demande de raffiner autant que possible le contenu de cet Erlenmeyer ☛", none, "5vw", 0, "1vw", "37%", none],
+	 []
+	]
+);
+
+
+START = 2;
