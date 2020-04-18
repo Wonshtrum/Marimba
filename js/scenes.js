@@ -24,7 +24,7 @@ sceneManager.addScene(
 );
 
 sceneManager.addScene(
-	"NIV_1",
+	"LVL_1",
 	3, 6,
 	[[Erlenmeyer.id, 0, 1, 2, false, [192, V]],
 	 [Erlenmeyer.id, 2, 2, 1, false, [24, O]],
@@ -55,15 +55,15 @@ sceneManager.addScene(
 	 ["A tout moment vous pouvez réinitialiser la réaction avec la touche \"entrer\"", ...onTop],
 	 ["La touche \"retour arrière\" réinitialise tout votre montage, utilisez la avec prudence !", ...onTop],
 	 ["Je pense en avoir assez dit disciple... C'est à vous de jouer !", ...onTop],
-	 ["", ...onTop],
+	 []
 	],
 	false
 );
 
 sceneManager.addScene(
-	"NIV_2",
+	"LVL_2",
 	3, 6,
-	[[Erlenmeyer.id, 2, 2, 1, false, [24, r1]],
+	[[Erlenmeyer.id, 2, 2, 1, false, [24, new Molecule([2,3,-2])]],
 	 [Vessel.id, 3, 2, 1, false, [8, O]],
 	],
 	[],
@@ -79,8 +79,40 @@ sceneManager.addScene(
 	 ["je vous rappelle qu'une tour de distillation placer au dessus d'un bruleur retire un élément au début et à la fin d'une chaine (si la chaine possède au moins 3 éléments)", ...onTop],
 	 ["Sachant cela, je vous demande de raffiner autant que possible le contenu de cet Erlenmeyer ☛", none, "5vw", 0, "1vw", "37%", none],
 	 []
-	]
+	],
+	false
 );
 
+sceneManager.addScene(
+	"LVL_3",
+	3, 6,
+	[[Erlenmeyer.id, 0, 1, 2, false, [192, O]],
+	 [Erlenmeyer.id, 2, 1, 2, false, [192, D]],
+	 [Vessel.id, 5, 1, 1, true, [24, new Molecule([-2,3,2])]],
+	 [Vessel.id, 5, 2, 1, true, [24, new Molecule([-2,3])]],
+	],
+	[],
+	[[-1, false], [2, false], [0, false], [2, false], [0, false]],
+	[["Bien disciple", ...onTop],
+	 ["La fusion est la discipline la plus noble et la plus complexe, je vous prie donc d'être attentif !", ...onTop],
+	 ["2 chaines peuvent être fusionnées dans à l'aide d'un bescher", ...onTop],
+	 ["je vous conseille d'en prendre un et de le poser sur la table pour l'examiner ☛", "3vw", none, 0, none, "69%", none],
+	 ["Comme vous pouvez le constater, un bescher a 2 entrées et une sortie", ...onTop],
+	 ["Une entrée est dîte primaire, l'autre secondaire", ...onTop],
+	 ["Leur nature est décidée par leur ordre de raccordement (respectivement première et dernière)", ...onTop],
+	 ["En passant votre curseur vide sur un bescher, vous pouvez voir qu'il indique 3 compositions", ...onTop],
+	 ["Il s'agit, dans l'ordre : du réactif primaire, secondaire et du résultat de fusion", ...onTop],
+	 ["La fusion se passe comme suit : la chaine secondaire est dupliquée et entour la chaine primaire", ...onTop],
+	 ["les extrémités compatibles fusionnent", ...onTop],
+	 ["aux extrémités non compatibles, la chaine secondaire est symétrisée et tente une nouvelle fois de fusionner", ...onTop],
+	 ["Si aucune fusion n'opère, la réaction échoue et les chaines sont ajoutées à la liste de réactifs du besher, elles essairont de fusionner de nouveau si une nouvelle chaine se présente", ...onTop],
+	 ["Si au moins une extrémité fusionne, la réaction est un succès et la nouvelle chaine peut être récupérée en sortie", ...onTop],
+	 ["Je vous invite fortement à commencer par raccorder les entrées d'un bescher et observer ce qu'il se passe", ...onTop],
+	 ["répétez l'opération plusieurs fois dans différentes configurations jusqu'à ce que le processus vous semble logique", ...onTop],
+	 ["puis tenter d'effectuer 2 fusions en parallèle permettant de satisfaire les critères de cette épreuve", ...onTop],
+	 []
+	],
+	false
+);
 
-START = 2;
+START = 3;
