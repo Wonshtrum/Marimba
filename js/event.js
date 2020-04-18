@@ -5,10 +5,12 @@ const clamp = (x, a, b) => {
 let canvasOffset;
 const resize = () => {
 	canvasOffset = canvas.getBoundingClientRect();
+	canvasOffset.scaleX = width/canvas.offsetWidth;
+	canvasOffset.scaleY = height/canvas.offsetHeight;
 }
 const xyOnCanvas = (e) => {
-	let x = Math.floor(width*(e.x-canvasOffset.x)/canvas.offsetWidth);
-	let y = Math.floor(height*(e.y-canvasOffset.y)/canvas.offsetHeight);
+	let x = Math.floor(canvasOffset.scaleX*(e.x-canvasOffset.x));
+	let y = Math.floor(canvasOffset.scaleY*(e.y-canvasOffset.y));
 	return [Math.floor(x)-xOffset, Math.floor(y)-yOffset];
 };
 
@@ -16,10 +18,34 @@ const posToPipe = (x, y) => [Math.floor(x/pside), Math.floor(y/pside)];
 const posToTile = (x, y) => [Math.floor(x/side), Math.floor(y/side)];
 const pipeToTile = (x, y) => [Math.floor(x/5), Math.floor(y/5)];
 
-mouse = {rx:0, ry:0, x:0, y:0, tx:0, ty:0, px:0, py:0, tile:null, save:null, selected:0, size:1};
+mouse = {rx:0, ry:0, x:0, y:0, tx:0, ty:0, px:0, py:0, tile:null, anchor:null, save:null, selected:0, size:1};
 mouse.slot = function() {
 	return slots.children[this.selected];
 }
+mouse.showMolecule = function(move) {
+	show = false;
+	if (Pipe.mat[this.py][this.px]) {
+		cursor.innerHTML = Pipe.molecule(this.px, this.py);
+		if (move) {
+			cursor.style.top = this.py*pside/canvasOffset.scaleY+canvasOffset.y+"px";
+			cursor.style.left = (this.px+1)*pside/canvasOffset.scaleX+canvasOffset.x+"px";
+		}
+		show = true;
+	} else if (this.tile instanceof Flask) {
+		cursor.innerHTML = this.tile.molecule();
+		if (move) {
+			cursor.style.top = this.tile.y*side/canvasOffset.scaleY+canvasOffset.y+"px";
+			cursor.style.left = this.tile.x*side/canvasOffset.scaleX+canvasOffset.x+"px";
+		}
+		show = true;
+	}
+	if (show) {
+		cursor.style.display = "";
+	} else {
+		cursor.style.display = "none";
+	}
+	return show;
+};
 mouse.update = function() {
 	let slot = this.slot();
 	if (slot.size === 2 && slot.count < 2*usesPerSize && slot.count > -1) {
@@ -43,13 +69,23 @@ mouse.move = function(e) {
 	[this.rx, this.ry] = xyOnCanvas(e);
 	this.calculate();
 };
-mouse.calculate = function() {
+mouse.calculate = function(force) {
 	this.y = clamp(this.ry, 0, height-1-(this.size-1)*side);
 	this.x = clamp(this.rx, 0, width-1-(this.size-1)*side);
 	let [oldpx, oldpy] = [this.px, this.py];
+	let oldTile = this.tile;
 	[this.px, this.py] = posToPipe(this.x, this.y);
+	if (oldpx === this.px && oldpy === this.py && !force) return;
 	[this.tx, this.ty] = posToTile(this.x, this.y);
 	this.tile = Tile.mat[this.ty][this.tx];
+	if (this.tile) {
+		this.anchor = this.tile.anchor(this.px, this.py);
+	} else {
+		this.anchor = null;
+	}
+	if (this.selected === 0) {
+		this.showMolecule(true);
+	}
 	this.checkValid();
 };
 mouse.start = function(e) {
@@ -76,6 +112,7 @@ mouse.end = function(e) {
 		} else {
 			Pipe.searchAndCut(this.px, this.py);
 		}
+		this.anchor = null;
 		this.update();
 		return;
 	}
@@ -131,9 +168,10 @@ mouse.drawRect = function(ctx) {
 };
 mouse.draw = function(ctx) {
 	if (this.selected === 0) {
-		if (this.tile && this.tile.anchor(this.px, this.py) === 1) {
+		if (sceneManager.physics) this.showMolecule(false);
+		if (this.anchor === 1) {
 			ctx.drawQuad(this.px*pside, this.py*pside, pside, pside, 9, full, 0, 1, 0.4);
-		} else if (this.tile && this.tile.anchor(this.px, this.py) === -1) {
+		} else if (this.anchor === -1) {
 			ctx.drawQuad(this.px*pside, this.py*pside, pside, pside, 9, full, 1, 0.2, 0.6);
 		} else {
 			ctx.drawQuad(this.px*pside, this.py*pside, pside, pside, 9, full, 0.4, .6, 0.7);

@@ -108,3 +108,17 @@ html, body {
 	background-color: #180c2570;
 	box-shadow: 0 0 20px #180c25;
 }
+
+#cursor {
+	pointer-events: none;
+	position: absolute;
+	background: #000b;
+	font-size: 1.2vw;
+	font-family: Aniron;
+	line-height: 1.2vw;
+	margin: 0.2vw;
+	padding: 1vw;
+	padding-top: 0;
+	padding-bottom: 1.4vw;
+	color: white;
+}

@@ -117,6 +117,27 @@ class Flask extends Tile {
 		this.pipeIn = [];
 		this.pipeOut = [];
 	}
+	molecule() {
+		if (this.level > 0) {
+			let print = "";
+			let current;
+			let last = this.liquid[0].print();
+			let times = 1;
+			for (let droplet of this.liquid.slice(1)) {
+				current = droplet.print();
+				if (current === last) {
+					times++;
+				} else {
+					print += "\n"+times+" "+last;
+					last = current;
+					times = 1;
+				}
+			}
+			print += "\n"+times+" "+last;
+			return print;
+		}
+		return "\n...";
+	}
 	plugIn(pipe) {
 		this.pipeIn.push(pipe);
 	}
@@ -190,8 +211,8 @@ class Distillation extends Flask {
 	push(droplet) {
 		if (this.level === this.maxLevel && this.y > 0 && Tile.mat[this.y-1][this.x]) {
 			let topTower = Tile.mat[this.y-1][this.x];
-			if (!topTower.isfull()) {
-				topTower.push(this.pump());
+			if (topTower.push(this.liquid[0])) {
+				this.pump();
 			}
 		}
 		return super.push(droplet);
@@ -209,7 +230,7 @@ for (let flask of [Erlenmeyer, Bescher, Distillation]) {
 		Array.from({length:5}, ()=>Array(5)),
 		Array.from({length:10}, ()=>Array(10))];
 	flask.maxLevel = levelBase;
-	flask.minLevel = 0;
+	flask.minLevel = 1;
 }
 Distillation.minLevel = Math.floor(2*levelBase/3);
 

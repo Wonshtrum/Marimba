@@ -84,6 +84,9 @@ class Pipe {
 	contains(x, y) {
 		return this.path.some(e => e[0]/pside === x && e[1]/pside === y);
 	}
+	molecule(x, y) {
+		return this.liquid.find((e, i) => this.path[i][0]/pside === x && this.path[i][1]/pside === y);
+	}
 	destroy() {
 		if (this.immutable) return false;
 		for (let [x, y] of this.path) {
@@ -205,3 +208,11 @@ Pipe.searchAndCut = (x, y) => {
 	}
 	return false;
 };
+Pipe.molecule = (x, y) => {
+	let molecule;
+	for (let pipe of Pipe.list) {
+		molecule = pipe.molecule(x, y);
+		if (molecule) return "\n"+molecule.print();
+	}
+	return "\n...";
+}

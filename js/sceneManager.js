@@ -98,6 +98,7 @@ class SceneManager {
 	reset() {
 		this.stop();
 		this.scenes[this.currentScene].reset();
+		mouse.calculate(true);
 	}
 	loadScene(index) {
 		clearInterval(this.loop);
@@ -110,6 +111,7 @@ class SceneManager {
 		this.scenes[index].load();
 		this.loop = setInterval(render, 35);
 		this.narrativeTimeout = setTimeout(() => this.nextNarrative(), second+1);
+		mouse.calculate(true);
 	}
 	reload() {this.loadScene(this.currentScene);}
 	nextScene() {this.loadScene(this.currentScene+1);}
@@ -153,7 +155,7 @@ sceneManager = new SceneManager([]);
 sceneManager.addScene(
 	"SCENE_0",
 	3, 6,
-	[[0, 1, 1, 2, false, potion([192, 0])]],
+	[[0, 1, 1, 2, false, potion([192, r3])]],
 	[],
 	[[-1, true], [-1, true], [-1, true], [-1, true], [-1, true]],
 	[]
@@ -180,9 +182,9 @@ sceneManager.addScene(
 	 [0,0,1,0,0,1,0,1,0,0],
 	 [0,0,0,0,1,1,0,0,0,0]],
 	[[0,0,0,0,0,0,0,0,0,0],
-	 [0,0,0,[3,2],0,[12,1],0,0,0,0],
-	 [0,0,[5,3],0,0,[24,0],0,0,0,0],
-	 [0,0,[96,1],0,[18,2],[24,3],0,0,0,0],
+	 [0,0,0,[3,r2],0,[12,r1],0,0,0,0],
+	 [0,0,[5,D],0,0,[24,r4],0,0,0,0],
+	 [0,0,[96,r3],0,[18,V],[24,O],0,0,0,0],
 	 [0,0,0,0,0,0,0,0,0,0]]),
 
 	[[[3,1,2,4],[0,-5],[4,0],[0,15]],
