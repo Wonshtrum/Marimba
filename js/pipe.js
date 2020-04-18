@@ -52,15 +52,15 @@ class Pipe {
 			if (dx) {
 				ddx = dx > 0 ? 1 : -1;
 				if (i != 0)
-					this.path.push([x*pside, y*pside, 9-ddx+3*ddy]);
+					this.path.push([x*pside, y*pside, 10-ddx+3*ddy]);
 				for (let j = ddx ; j != dx ; j += ddx)
-					this.path.push([(x+j)*pside, y*pside, 6]);
+					this.path.push([(x+j)*pside, y*pside, 7]);
 			} else {
 				ddy = dy > 0 ? 1 : -1;
 				if (i != 0)
-					this.path.push([x*pside, y*pside, 9+ddx-3*ddy]);
+					this.path.push([x*pside, y*pside, 10+ddx-3*ddy]);
 				for (let j = ddy ; j != dy ; j+=ddy)
-					this.path.push([x*pside, (y+j)*pside, 8]);
+					this.path.push([x*pside, (y+j)*pside, 9]);
 			}
 			x += dx;
 			y += dy;
@@ -116,6 +116,7 @@ class Pipe {
 		}
 		this.liquid.shift(0);
 		this.liquid.push(this.input.pump());
+		return true;
 	}
 	draw(ctx) {
 		let x, y, t;

@@ -286,18 +286,44 @@ class Distillation extends Flask {
 };
 Distillation.id = 2;
 
+class Vessel extends Flask {
+	constructor(x, y, size, shelf, goal, immutable) {
+		super(x, y, size, shelf, [], immutable);
+		this.goal = [goal[0], goal[1].print()];
+		Vessel.list.push(this);
+	}
+	push(droplet) {
+		let pushed = super.push(droplet);
+		if (pushed) {
+			this.completed = this.liquid.filter(e => e.print() === this.goal[1]).length >= this.goal[0];
+			if (this.completed) {
+				sceneManager.complete();
+			}
+		}
+		return pushed;
+	}
+	draw(ctx) {
+		super.draw(ctx);
+		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 5, this.fill, R, G, B);
+	}
+}
+Vessel.list = [];
+Vessel.id = 5;
+
 //STATIC MEMBERS FOR FLASKS
-for (let flask of [Erlenmeyer, Bescher, Distillation]) {
+for (let flask of [Erlenmeyer, Bescher, Distillation, Vessel]) {
 	flask.anchors = [
 		Array.from({length:5}, ()=>Array(5)),
 		Array.from({length:10}, ()=>Array(10))];
 	flask.maxLevel = levelBase;
-	flask.minLevel = 1;
+	flask.minLevel = 0;
 }
 Distillation.minLevel = Math.floor(2*levelBase/3);
 
-for (let [x, y, s, t] of [[2,0,0,1],[4,0,1,1],[5,0,1,1]])
+for (let [x, y, s, t] of [[2,0,0,1],[4,0,1,1],[5,0,1,1]]) {
 	Erlenmeyer.anchors[s][y][x] = t;
+	Vessel.anchors[s][y][x] = -t;
+}
 for (let [x, y, s, t] of [[1,0,0,-1],[2,0,0,1],[3,0,0,-1],[3,0,1,-1],[4,0,1,1],[5,0,1,1],[6,0,1,-1]])
 	Bescher.anchors[s][y][x] = t;
 for (let [x, y, s, t] of [[2,0,0,1],[1,1,0,1],[3,1,0,1],[1,4,0,-1],[3,4,0,-1]])
@@ -338,5 +364,5 @@ class Spout extends Tile {
 };
 Spout.id = 4;
 
-Tile.types = [Erlenmeyer, Bescher, Distillation, Shelf, Spout];
-Tile.nameToClass = {"Erlenmeyer": Erlenmeyer, "Bescher": Bescher, "Distillation": Distillation, "Shelf": Shelf, "Spout": Spout};
+Tile.types = [Erlenmeyer, Bescher, Distillation, Shelf, Spout, Vessel];
+Tile.nameToClass = {"Erlenmeyer": Erlenmeyer, "Bescher": Bescher, "Distillation": Distillation, "Shelf": Shelf, "Spout": Spout, "Vessel": Vessel};

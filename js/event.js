@@ -159,23 +159,25 @@ mouse.wheel = function(e) {
 mouse.drawRect = function(ctx) {
 	if (this.selected !== 0) {
 		if (this.isValidPosition) {
-			ctx.drawQuad(this.tx*side, this.ty*side, this.size*side, this.size*side, 9, full, 0, 0.5, 0.3);
+			ctx.drawQuad(this.tx*side, this.ty*side, this.size*side, this.size*side, 10, full, 0, 0.5, 0.3);
 		} else {
-			ctx.drawQuad(this.tx*side, this.ty*side, this.size*side, this.size*side, 9, full, 0.1, 0.2, 0.3);
+			ctx.drawQuad(this.tx*side, this.ty*side, this.size*side, this.size*side, 10, full, 0.1, 0.2, 0.3);
 		}
 	} else if (this.tile) {
-		ctx.drawQuad(this.tile.x*side, this.tile.y*side, this.tile.size*side, this.tile.size*side, 9, full, 0.1, 0.2, 0.3);
+		ctx.drawQuad(this.tile.x*side, this.tile.y*side, this.tile.size*side, this.tile.size*side, 10, full, 0.1, 0.2, 0.3);
 	}
 };
 mouse.draw = function(ctx) {
 	if (this.selected === 0) {
-		if (sceneManager.physics) this.showMolecule(false);
-		if (this.anchor === 1) {
-			ctx.drawQuad(this.px*pside, this.py*pside, pside, pside, 9, full, 0, 1, 0.4);
+		if (sceneManager.physics) {
+			ctx.drawQuad(this.px*pside, this.py*pside, pside, pside, 10, full, 1, 0.2, 0.8);
+			this.showMolecule(false);
+		} else if (this.anchor === 1) {
+			ctx.drawQuad(this.px*pside, this.py*pside, pside, pside, 10, full, 0, 1, 0.4);
 		} else if (this.anchor === -1) {
-			ctx.drawQuad(this.px*pside, this.py*pside, pside, pside, 9, full, 1, 0.2, 0.6);
+			ctx.drawQuad(this.px*pside, this.py*pside, pside, pside, 10, full, 1, 0.2, 0.6);
 		} else {
-			ctx.drawQuad(this.px*pside, this.py*pside, pside, pside, 9, full, 0.4, .6, 0.7);
+			ctx.drawQuad(this.px*pside, this.py*pside, pside, pside, 10, full, 0.4, .6, 0.7);
 		}
 	}
 };

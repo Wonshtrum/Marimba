@@ -84,7 +84,7 @@ const start = () => {
 	gl.bindTexture(gl.TEXTURE_2D, textures["sprites"]);
 	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, textures["bg"]);
-	sceneManager.loadScene(1);
+	sceneManager.loadScene(0);
 }
 
 //WAIT FOR TEXTURES TO BE LOADED

@@ -15,7 +15,8 @@ const matToList = (row, col, obj, size, shelf, level) => {
 }
 
 class Scene {
-	constructor(name, row, col, objList, pipeList, slotList, narrative) {
+	constructor(name, row, col, objList, pipeList, slotList, narrative, completed) {
+		this.completed = getOrElse(completed, false);
 		this.name = name;
 		this.row = row;
 		this.col = col;
@@ -32,12 +33,17 @@ class Scene {
 		updateFbos();
 		Tile.list = [];
 		Tile.mat = Array.from({length: row}, () => Array(col));
+		Vessel.list = [];
 		Pipe.last = true;
 		Pipe.list = [];
 		Pipe.mat = Array.from({length:row*5}, () => Array(col*5).fill(0));
 
 		for (let [type, x, y, size, shelf, fill] of this.objList) {
-			new Tile.types[type](x, y, size, shelf, potion(fill), true);
+			if (type === Vessel.id) {
+				new Tile.types[type](x, y, size, shelf, fill, true);
+			} else {
+				new Tile.types[type](x, y, size, shelf, potion(fill), true);
+			}
 		}
 		for (let pipe of this.pipeList) {
 			let [X, Y, x, y] = pipe[0];
@@ -55,7 +61,9 @@ class Scene {
 			if (tile instanceof Flask) {
 				if (i < this.objList.length) {
 					tile.empty();
-					tile.liquid = potion(this.objList[i][5]);
+					if (!(tile instanceof Vessel)) {
+						tile.liquid = potion(this.objList[i][5]);
+					}
 				} else {
 					tile.empty();
 				}
@@ -78,9 +86,14 @@ class SceneManager {
 		this.maxNarrative = 0;
 		this.narrativeTimeout = 0;
 		this.loop;
+		this.interupted = false;
 	}
-	addScene(name, row, col, objList, pipeList, slotList, narrative) {
-		this.scenes.push(new Scene(name, row, col, objList, pipeList, slotList, narrative));
+	addScene(name, row, col, objList, pipeList, slotList, narrative, completed) {
+		this.scenes.push(new Scene(name, row, col, objList, pipeList, slotList, narrative, completed));
+	}
+	complete() {
+		this.completed = !this.interupted && Vessel.list.every(e => e.completed);
+		alert("Bien joué !");
 	}
 	start() {
 		select(0);
@@ -96,6 +109,7 @@ class SceneManager {
 		}
 	}
 	stop() {
+		this.interupted = true;
 		this.physics = false;
 		for (let tile of Tile.list)
 			if (tile instanceof Spout)
@@ -103,6 +117,7 @@ class SceneManager {
 	}
 	reset() {
 		this.stop();
+		this.interupted = false;
 		this.scenes[this.currentScene].reset();
 		mouse.calculate(true);
 	}
@@ -111,10 +126,12 @@ class SceneManager {
 		clearTimeout(this.narrativeTimeout);
 		narrative.classList.remove("show");
 		this.stop();
+		this.interupted = false;
 		this.currentScene = index;
 		this.currentNarrative = -1;
 		this.maxNarrative = this.scenes[index].narrative.length-1;
 		this.scenes[index].load();
+		this.completed = this.scenes[index].completed;
 		this.loop = setInterval(render, 35);
 		this.narrativeTimeout = setTimeout(() => this.nextNarrative(), second+1);
 		mouse.calculate(true);
@@ -122,6 +139,7 @@ class SceneManager {
 	reload() {
 		let physics = this.physics;
 		this.stop();
+		this.interupted = false;
 		let start = Date.now();
 		let user = confirm("Toutes les modifications seront supprimées.");
 		let time = Date.now() - start;
@@ -135,6 +153,9 @@ class SceneManager {
 	nextNarrative() {
 		if (this.currentNarrative < this.maxNarrative) {
 			this.displayText(...this.scenes[this.currentScene].narrative[++this.currentNarrative]);
+			return true;
+		} else if (this.completed) {
+			this.nextScene();
 			return true;
 		}
 		return false;
@@ -169,7 +190,7 @@ class SceneManager {
 
 sceneManager = new SceneManager([]);
 
-sceneManager.addScene(
+/*sceneManager.addScene(
 	"SCENE_0",
 	3, 6,
 	[[0, 1, 1, 2, false, [192, r3]]],
@@ -216,4 +237,4 @@ sceneManager.addScene(
 	 ["a", none, 0, none, 0, none, none],
 	 ["narrative!", 0, 0, 0, 0, none, none],
 	 ["", 0, 0, 0, 0, 0, 0]]
-);
+);*/
