@@ -1,11 +1,11 @@
-const potion = e => e ? Array(e[0]).fill(e[1]) : [];
+const potion = e => e ? Array.from({length:e[0]}, _ => e[1].copy()) : [];
 
 const matToList = (row, col, obj, size, shelf, level) => {
 	list = [];
 	for (let i = 0 ; i < col ; i++) {
 		for (let j = 0 ; j < row ; j++) {
 			if (obj[j][i]) {
-				list.push([obj[j][i]-1, i, j, size[j][i]+1, shelf[j][i] === 1, potion(level[j][i])]);
+				list.push([obj[j][i]-1, i, j, size[j][i]+1, shelf[j][i] === 1, level[j][i]]);
 			} else if (shelf[j][i]) {
 				list.push([3, i, j, size[j][i]+1]);
 			}
@@ -37,7 +37,7 @@ class Scene {
 		Pipe.mat = Array.from({length:row*5}, () => Array(col*5).fill(0));
 
 		for (let [type, x, y, size, shelf, fill] of this.objList) {
-			new Tile.types[type](x, y, size, shelf, fill, true);
+			new Tile.types[type](x, y, size, shelf, potion(fill), true);
 		}
 		for (let pipe of this.pipeList) {
 			let [X, Y, x, y] = pipe[0];
@@ -54,9 +54,10 @@ class Scene {
 			let tile = Tile.list[i];
 			if (tile instanceof Flask) {
 				if (i < this.objList.length) {
-					tile.liquid = this.objList[i][5].copy();
+					tile.empty();
+					tile.liquid = potion(this.objList[i][5]);
 				} else {
-					tile.liquid = [];
+					tile.empty();
 				}
 				tile.updateLevel();
 			}
@@ -85,9 +86,14 @@ class SceneManager {
 		select(0);
 		mouse.end({which:1, target:none});
 		this.physics = true;
-		for (let tile of Tile.list)
-			if (tile instanceof Spout)
+		for (let tile of Tile.list) {
+			if (tile instanceof Spout) {
 				tile.lit(true);
+			} else if (tile instanceof Distillation) {
+				tile.hot = false;
+				tile.onFire();
+			}
+		}
 	}
 	stop() {
 		this.physics = false;
@@ -113,7 +119,18 @@ class SceneManager {
 		this.narrativeTimeout = setTimeout(() => this.nextNarrative(), second+1);
 		mouse.calculate(true);
 	}
-	reload() {this.loadScene(this.currentScene);}
+	reload() {
+		let physics = this.physics;
+		this.stop();
+		let start = Date.now();
+		let user = confirm("Toutes les modifications seront supprimées.");
+		let time = Date.now() - start;
+		if (user || time < 10) {
+			this.loadScene(this.currentScene);
+		} else if (physics) {
+			this.start();
+		}
+	}
 	nextScene() {this.loadScene(this.currentScene+1);}
 	nextNarrative() {
 		if (this.currentNarrative < this.maxNarrative) {
@@ -155,7 +172,7 @@ sceneManager = new SceneManager([]);
 sceneManager.addScene(
 	"SCENE_0",
 	3, 6,
-	[[0, 1, 1, 2, false, potion([192, r3])]],
+	[[0, 1, 1, 2, false, [192, r3]]],
 	[],
 	[[-1, true], [-1, true], [-1, true], [-1, true], [-1, true]],
 	[]
@@ -182,9 +199,9 @@ sceneManager.addScene(
 	 [0,0,1,0,0,1,0,1,0,0],
 	 [0,0,0,0,1,1,0,0,0,0]],
 	[[0,0,0,0,0,0,0,0,0,0],
-	 [0,0,0,[3,r2],0,[12,r1],0,0,0,0],
-	 [0,0,[5,D],0,0,[24,r4],0,0,0,0],
-	 [0,0,[96,r3],0,[18,V],[24,O],0,0,0,0],
+	 [0,0,0,[3,r2],0,0,0,0,0,0],
+	 [0,0,[5,D],0,0,0,0,0,0,0],
+	 [0,0,[96,r4],0,[18,V],[24,O],0,0,0,0],
 	 [0,0,0,0,0,0,0,0,0,0]]),
 
 	[[[3,1,2,4],[0,-5],[4,0],[0,15]],

@@ -101,7 +101,7 @@ class Pipe {
 	flow() {
 		if (!this.persistent) return false;
 		if (this.liquid[0] !== false) {
-			if (this.output.push(this.liquid[0])) {
+			if (this.output.push(this.liquid[0], this)) {
 				if (!(this.output instanceof Distillation)) {
 					new Particule(
 						this.path[0][0]+4, this.path[0][1]+pside-2,

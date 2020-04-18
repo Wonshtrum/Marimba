@@ -97,6 +97,7 @@ mouse.start = function(e) {
 	}
 };
 mouse.end = function(e) {
+	if (e.which === 2) console.log(this.tile);
 	if (sceneManager.physics) return;
 	if (e.which === 3 && e.target === canvas) {
 		let [tx, ty] = posToTile(this.rx, this.ry);

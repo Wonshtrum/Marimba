@@ -117,26 +117,11 @@ class Flask extends Tile {
 		this.pipeIn = [];
 		this.pipeOut = [];
 	}
+	empty() {
+		this.liquid = [];
+	}
 	molecule() {
-		if (this.level > 0) {
-			let print = "";
-			let current;
-			let last = this.liquid[0].print();
-			let times = 1;
-			for (let droplet of this.liquid.slice(1)) {
-				current = droplet.print();
-				if (current === last) {
-					times++;
-				} else {
-					print += "\n"+times+" "+last;
-					last = current;
-					times = 1;
-				}
-			}
-			print += "\n"+times+" "+last;
-			return print;
-		}
-		return "\n...";
+		return moleculeList(this.liquid);
 	}
 	plugIn(pipe) {
 		this.pipeIn.push(pipe);
@@ -167,7 +152,7 @@ class Flask extends Tile {
 		return this.level >= this.maxLevel;
 	}
 	pump() {
-		if (this.level <= this.minLevel) return false;
+		if (this.liquid.length <= this.minLevel) return false;
 		this.level--;
 		this.updateFill()
 		return this.liquid.shift(0);
@@ -190,6 +175,67 @@ class Erlenmeyer extends Flask {
 Erlenmeyer.id = 0;
 
 class Bescher extends Flask {
+	constructor(x, y, size, shelf, liquid, immutable) {
+		super(x, y, size, shelf, liquid, immutable);
+		this.react0 = [];
+		this.react1 = [];
+	}
+	empty() {
+		this.liquid = [];
+		this.react0 = [];
+		this.react1 = [];
+	}
+	molecule() {
+		return moleculeList(this.react0)+"\n"+moleculeList(this.react1)+"\n"+moleculeList(this.liquid);
+	}
+	tryReact0(b) {
+		let r;
+		for (let a of this.react0) {
+			r = fuse(a, b);
+			if (r) {
+				this.react0.remove(a);
+				return r;
+			}
+		}
+		return false;
+	}
+	tryReact1(a) {
+		let r;
+		for (let b of this.react1) {
+			r = fuse(a, b);
+			if (r) {
+				this.react1.remove(b);
+				return r;
+			}
+		}
+		return false;
+	}
+	push(droplet, pipe) {
+		let r;
+		let primary = pipe === this.pipeIn[0];
+		if (primary) {
+			r = this.tryReact1(droplet);
+			if (r) {
+				this.liquid.push(r);
+				return true;
+			}
+		} else {
+			r = this.tryReact0(droplet);
+			if (r) {
+				this.liquid.push(r);
+				return true;
+			}
+		}
+		if (this.isfull()) return false;
+		this.level++;
+		this.updateFill();
+		if (primary) {
+			this.react0.push(droplet);
+		} else {
+			this.react1.push(droplet);
+		}
+		return true;
+	}
 	draw(ctx) {
 		super.draw(ctx);
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 1, this.fill, R, G, B);
@@ -215,7 +261,23 @@ class Distillation extends Flask {
 				this.pump();
 			}
 		}
-		return super.push(droplet);
+		let pushed = super.push(droplet);
+		if (pushed && this.hot) droplet.distill();
+		return pushed;
+	}
+	onFire() {
+		if (this.hot) return true;
+		if (this.y < row-1) {
+			let tile = Tile.mat[this.y+1][this.x];
+			if (tile instanceof Spout) {
+				this.hot = true;
+			} else if (tile instanceof Distillation) {
+				this.hot = tile.onFire();
+			} else {
+				this.hot = false;
+			}
+		}
+		return this.hot;
 	}
 	draw(ctx) {
 		ctx.drawQuad(this.x*side, this.y*side, this.size*side, this.size*side, 2, this.fill, R, G, B);
