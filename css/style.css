@@ -17,7 +17,7 @@ html, body {
 	margin: 0;
 	background-color: black;
 	user-select: none;
-	font-family: Aniron;
+	font-family: DejaVu;
 	--scaleX: 0.9;
 }
 
@@ -67,8 +67,8 @@ html, body {
 	transition: opacity 1s;
 	white-space: pre-line;
 }
-#narrative.show {
-	opacity: 1;
+.show {
+	opacity: 1 !important;
 }
 
 #myCan {
@@ -122,4 +122,5 @@ html, body {
 	padding-top: 0;
 	padding-bottom: 1.4vw;
 	color: white;
+	opacity: 0;
 }

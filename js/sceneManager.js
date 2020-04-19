@@ -80,7 +80,7 @@ class SceneManager {
 	constructor(scenes) {
 		this.frames = 0;
 		this.physics = false;
-		this.scenes = scenes;
+		this.scenes = getOrElse(scenes, []);
 		this.currentScene = -1;
 		this.currentNarrative = 0;
 		this.maxNarrative = 0;
@@ -188,53 +188,4 @@ class SceneManager {
 }
 
 
-sceneManager = new SceneManager([]);
-
-/*sceneManager.addScene(
-	"SCENE_0",
-	3, 6,
-	[[0, 1, 1, 2, false, [192, r3]]],
-	[],
-	[[-1, true], [-1, true], [-1, true], [-1, true], [-1, true]],
-	[]
-);
-sceneManager.addScene(
-	"SCENE_1",
-
-	5, 10,
-
-	matToList(5, 10,
-	[[0,0,0,0,0,0,0,0,0,0],
-	 [0,0,0,1,0,3,0,3,0,0],
-	 [0,0,2,0,0,3,0,3,0,0],
-	 [2,0,1,0,2,3,0,1,0,0],
-	 [0,0,0,0,0,5,0,0,0,0]],
-	[[0,0,0,0,0,0,0,0,0,0],
-	 [0,0,0,0,0,0,0,0,0,0],
-	 [0,0,0,0,0,0,0,0,0,0],
-	 [1,0,1,0,0,0,0,1,0,0],
-	 [0,0,0,0,0,0,0,0,0,0]],
-	[[0,0,0,0,0,0,0,0,0,0],
-	 [0,0,0,0,0,1,0,1,0,0],
-	 [0,0,0,1,0,1,0,1,0,0],
-	 [0,0,1,0,0,1,0,1,0,0],
-	 [0,0,0,0,1,1,0,0,0,0]],
-	[[0,0,0,0,0,0,0,0,0,0],
-	 [0,0,0,[3,r2],0,0,0,0,0,0],
-	 [0,0,[5,D],0,0,0,0,0,0,0],
-	 [0,0,[96,r4],0,[18,V],[24,O],0,0,0,0],
-	 [0,0,0,0,0,0,0,0,0,0]]),
-
-	[[[3,1,2,4],[0,-5],[4,0],[0,15]],
-	 [[5,1,2,2],[0,-5],[-4,0],[0,15]],
-	 [[2,2,2,5],[0,-6],[-4,0],[0,-1],[1,0],[0,2],[-5,0],[0,1],[3,0],[0,1],[-2,0],[0,1],[1,0],[0,6]]],
-
-	[[-1, false], [3, true], [2, false], [9, true], [4, false]],
-
-	[["Hello\nworld!", 0, none, none, 0, none, none],
-	 ["This", 0, none, 0, none, none, none],
-	 ["is", none, 0, 0, none, none, none],
-	 ["a", none, 0, none, 0, none, none],
-	 ["narrative!", 0, 0, 0, 0, none, none],
-	 ["", 0, 0, 0, 0, 0, 0]]
-);*/
+sceneManager = new SceneManager();

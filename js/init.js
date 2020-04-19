@@ -32,6 +32,7 @@ const canvas = document.getElementById('myCan');
 const slots = document.getElementById("slots");
 const background = document.getElementById("background");
 const narrative = document.getElementById("narrative");
+const cursor = document.getElementById("cursor");
 setDimensions(1, 1);
 
 //create the inventory slots and link them to the mouse
@@ -78,6 +79,7 @@ for (let i = 0 ; i < nbSlots ; i++) {
 	slot.slotCount = slotCount;
 }
 const select = slot => {
+	cursor.classList.remove("show");
 	if (sceneManager.physics) return;
 	for (let i = 0 ; i < nbSlots ; i++) {
 		slots.children[i].classList.remove("selected");

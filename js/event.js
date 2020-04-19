@@ -40,9 +40,9 @@ mouse.showMolecule = function(move) {
 		show = true;
 	}
 	if (show) {
-		cursor.style.display = "";
+		cursor.classList.add("show");
 	} else {
-		cursor.style.display = "none";
+		cursor.classList.remove("show");
 	}
 	return show;
 };
@@ -75,7 +75,7 @@ mouse.calculate = function(force) {
 	let [oldpx, oldpy] = [this.px, this.py];
 	let oldTile = this.tile;
 	[this.px, this.py] = posToPipe(this.x, this.y);
-	if (oldpx === this.px && oldpy === this.py && !force) return;
+	//if (oldpx === this.px && oldpy === this.py && !force) return;
 	[this.tx, this.ty] = posToTile(this.x, this.y);
 	this.tile = Tile.mat[this.ty][this.tx];
 	if (this.tile) {
