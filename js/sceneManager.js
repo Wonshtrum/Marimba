@@ -92,8 +92,16 @@ class SceneManager {
 		this.scenes.push(new Scene(name, row, col, objList, pipeList, slotList, narrative, completed));
 	}
 	complete() {
-		this.completed = !this.interupted && Vessel.list.every(e => e.completed);
-		if (this.completed) alert("Bien joué !");
+		let completed = Vessel.list.every(e => e.completed);
+		if (completed) {
+			narrative.classList.add("show");
+			if (!this.interupted) {
+				this.displayText("Parfait !");
+			} else {
+				this.displayText("La réaction a été interrompue...\nrecommencez !");
+			}
+			this.completed = completed && !this.interupted;
+		}
 	}
 	start() {
 		select(0);

@@ -35,6 +35,25 @@ const breakParticules = (x, y, size, side, scale) => {
 	}
 };
 
+const firework = (x, y, size, side) => {
+	for (let i = 0 ; i < 5 ; i++) {
+		setTimeout(() => {
+			for (let j = 0 ; j < particulesPerSize*size*5 ; j++) {
+				let angle = rnd()*Math.PI*2;
+		let mag = 0.1*size;
+				let ax = Math.sin(angle)*mag;
+				let ay = Math.cos(angle)*mag;
+				new Particule(
+					(x+size/2)*side, (y+size*0.62)*side,
+					1, 1, 1, 1, 1,
+					5*size, 0, range(0.5,0.5), range(0.5,0.5), 0,
+					20, ax, ay
+				);
+			}
+		}, 100*i);
+	}
+};
+
 class Tile {
 	constructor(x, y, size, shelf, immutable) {
 		this.x = x;
@@ -255,9 +274,9 @@ class Distillation extends Flask {
 		return anchor;
 	}
 	push(droplet) {
-		if (this.level === this.maxLevel && this.y > 0 && Tile.mat[this.y-1][this.x]) {
+		if (this.level === this.maxLevel && this.y > 0) {
 			let topTower = Tile.mat[this.y-1][this.x];
-			if (topTower.push(this.liquid[0])) {
+			if (topTower instanceof Distillation && topTower.push(this.liquid[0])) {
 				this.pump();
 			}
 		}
@@ -300,6 +319,7 @@ class Vessel extends Flask {
 		if (pushed) {
 			this.completed = this.liquid.filter(e => e.print() === this.goal[1]).length >= this.goal[0];
 			if (this.completed) {
+				firework(this.x, this.y, this.size, side, 3);
 				sceneManager.complete();
 			}
 		}
