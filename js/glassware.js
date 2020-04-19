@@ -38,7 +38,7 @@ const breakParticules = (x, y, size, side, scale) => {
 const firework = (x, y, size, side) => {
 	for (let i = 0 ; i < 5 ; i++) {
 		setTimeout(() => {
-			for (let j = 0 ; j < particulesPerSize*size*5 ; j++) {
+			for (let j = 0 ; j < particulesPerSize*size*7 ; j++) {
 				let angle = rnd()*Math.PI*2;
 		let mag = 0.1*size;
 				let ax = Math.sin(angle)*mag;

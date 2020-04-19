@@ -96,6 +96,23 @@ sceneManager.addScene(
 );
 
 sceneManager.addScene(
+	"LVL_2.5",
+	3, 6,
+	[[Erlenmeyer.id, 0, 1, 2, false, [192, new Molecule([1,-1])]],
+	 [Vessel.id, 3, 2, 1, false, [24, new Molecule([1,-1])]],
+	 [Vessel.id, 4, 2, 1, false, [24, new Molecule([1,-1])]],
+	 [Vessel.id, 5, 2, 1, false, [24, new Molecule([1,-1])]],
+	],
+	[],
+	[[-1, false], [0, false], [1, false], [0, false], [0, false]],
+	[["Bien disciple", ...onTop],
+	 ["La distillation est un processus très utile, mais tâchez de ne pas oublier que l'on peut utiliser une tour de distillation sans brûleur", ...onTop],
+	 []
+	],
+	false
+);
+
+sceneManager.addScene(
 	"LVL_3",
 	3, 6,
 	[[Erlenmeyer.id, 0, 1, 2, false, [192, O]],
@@ -166,6 +183,23 @@ sceneManager.addScene(
 	[[-1, false], [5, true], [5, false], [10, true], [5, true]],
 	[["Bien disciple", ...onTop],
 	 ["J'espère que vous n'êtes pas au bout de vos ressources, car voici la première épreuve", ...onTop],
+	 []
+	],
+	false
+);
+
+sceneManager.addScene(
+	"LVL_6",
+	5, 10,
+	[[Erlenmeyer.id, 0, 3, 2, true, [192, O]],
+	 [Erlenmeyer.id, 2, 3, 2, true, [192, D]],
+	 [Erlenmeyer.id, 4, 3, 2, true, [192, V]],
+	 [Vessel.id, 9, 4, 1, true, [1, new Molecule([-1,1,-2,3,-3,2,-2])]],
+	],
+	[],
+	[[-1, false], [10, true], [10, false], [20, true], [5, true]],
+	[["Bien disciple", ...onTop],
+	 ["épreuve suivante", ...onTop],
 	 []
 	],
 	false
