@@ -155,32 +155,34 @@ Pipe.fromPoints = (x0, y0, x1, y1, persistent, tileOut, tileIn) => {
 			path.push([0, -1]);
 		}
 	}
+	let padT = 0;
+	let padS = 1;
 	if (py0 == 0) {
 		oy += s0;
-		y0 -= 1;
-		path.push([0, -1-s0]);
+		y0 -= padT;
+		path.push([0, -padT-s0]);
 	} else if (px0 < 2) {
 		ox += pad;
-		x0 -= 2;
+		x0 -= padS;
 		[dx, dy] = [-1, 0];
-		path.push([-pad-2, 0]);
+		path.push([-pad-padS, 0]);
 	} else if (px0 > 2) {
 		ox -= pad;
-		x0 += 2;
+		x0 += padS;
 		[dx, dy] = [1, 0];
-		path.push([pad+2, 0]);
+		path.push([pad+padS, 0]);
 	}
 
 	if (full) {
 		if (py1 == 0) {
-			y1 -= 1;
-			tmp = [0, 1+s1];
+			y1 -= padT;
+			tmp = [0, padT+s1];
 		} else if (px1 < 2) {
-			x1 -= 2;
-			tmp = [pad+2, 0];
+			x1 -= padS;
+			tmp = [pad+padS, 0];
 		} else if (px1 > 2) {
-			x1 += 2;
-			tmp = [-pad-2, 0];
+			x1 += padS;
+			tmp = [-pad-padS, 0];
 		}
 	}
 
